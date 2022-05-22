@@ -2,7 +2,7 @@
 
 import argparse, os
 from function import pcr_pipline, print_c
-
+import pandas as pd
 def create_arg_parser():
 	parser = argparse.ArgumentParser(description = "single cell mutant library inspertion")
 	parser.add_argument('-m', '--model', default = 'print_c')
@@ -30,7 +30,14 @@ def pcr_pipline():
 	
 	os.system('gzip -cd ' + name1_2 + ' ' + name2_2 + ' > ' + arg.project_name + '.fq')
 
-	os.system('python3 parse_gRNA.py my_project.fq NoIMET1_gRNAs.csv GGTAGAATTGGTCGTTGCCATCGACCAGGC > PCR-ku.stats')
+	os.system('python3 parse_gRNA.py my_project.fq NoIMET1_gRNAs.csv GGTAGAATTGGTCGTTGCCATCGACCAGGC > counts.stats')
+
+	df1 = pd.read_csv("counts.stats", sep = "\t", header = None, names = ["gene_id", "sequence", "counts", "percent"])
+	t = df1["counts"].sum()
+	df1["percent"] = df1["counts"]/t
+	df1["percent"].round(3)	
+	df1 = df1.sort_values(by="counts", ascending = False)
+	df1.to_csv("percent.stats", sep = "\t", index = False)
 
 
 if __name__ == "__main__":
