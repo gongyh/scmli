@@ -16,7 +16,6 @@ Identification and description of gRNA mutant library
 ## Install
 
 ```
-```
 git clone https://github.com/gongyh/scmli.git
 ```
 ## Usage
