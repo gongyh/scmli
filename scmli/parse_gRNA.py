@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from Bio import SeqIO
 from Bio.Seq import Seq
 import sys
@@ -33,7 +34,7 @@ def parse_gRNA(fqfile, lib, fix_seq):
         f = open("counts.stats", "a")
         if k in gRNA_gene.keys():
             gene = gRNA_gene[k]
-            print("%s\t%s\t%d"%(gene,k,v), file = f)
+        print("%s\t%s\t%d"%(gene,k,v), file = f)
                 
 
 
