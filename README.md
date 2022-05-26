@@ -30,16 +30,16 @@ example: scmli.py -m PCR -l NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC 
 ## Arguments
 
 ```
-optional arguments: 
-  -h, --help            show this help message and exit 
-  -m {PCR,TEST}, --model {PCR,TEST}    
+optional arguments:
+  -h, --help            show this help message and exit
+  -m {PCR,TEST}, --model {PCR,TEST}
   -l LIB, --lib LIB
-  -s SEQ, --seq SEQ
+  -s SEQ, --seq SEQ     The fixed sequence for search
   -r1 READ1, --read1 READ1
   -r2 READ2, --read2 READ2
-  -n PROJECT_NAME, --project_name PROJECT_NAME
-  -o OUTDIR, --outdir OUTDIR
- ```
+  -n OUTPUT_NAME, --output_name OUTPUT_NAME
+  -o OUTPUT_DIR, --output_dir OUTPUT_DIR
+```
 
 
 ## License
