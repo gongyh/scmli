@@ -37,18 +37,3 @@ def parse_gRNA(fqfile, lib, fix_seq):
         print("%s\t%s\t%d"%(gene,k,v), file = f)
                 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
