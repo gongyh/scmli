@@ -14,6 +14,7 @@ Single cell mutant library inspection
 
 ## Background
 Identification and description of gRNA mutant library 
+
 ## Install
 
 ```
@@ -22,16 +23,17 @@ git clone https://github.com/gongyh/scmli.git
 
 ### Software Requirements
 
-Python3<br />
+Python 3.x <br />
 biopython 1.78 (python package)<br />
 pandas 1.4.2 (python package)<br />
 argparse 1.1 (python package)<br />
 fastqc 0.11.9<br />
 trim_galore 0.6.7<br />
+Miniconda3<br />
 
 To install python package:
 ```
-pip install -r requirements.txt
+pip install --user -r requirements.txt
 ```
 To install software:
 ```
@@ -48,8 +50,13 @@ usage: scmli.py [-h] [-m {PCR,TEST}] -l LIB [-s SEQ] [-r1 READ1] [-r2 READ2] [-n
 example: python3 scmli.py -m PCR -l ../test/NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC -r1 ../test/test1.fq.gz -r2 ../test/test2.fq.gz 
 ```
 
-## Arguments
+## Test
+```
+cd {dir of scmli} #
+python3 scmli/scmli.py -m PCR -l test/NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC -r1 test/test1.fq.gz -r2 test/test2.fq.gz -o {output_dir}
+```
 
+## Arguments
 ```
 optional arguments:
   -h, --help            show this help message and exit
@@ -61,6 +68,7 @@ optional arguments:
   -n OUTPUT_NAME, --output_name OUTPUT_NAME
   -o OUTPUT_DIR, --output_dir OUTPUT_DIR
 ```
+
 ## Results
 percent.stats: show the counts and percent of target sequences
 ```
@@ -71,7 +79,9 @@ NO08G01490      TGCCTCAGGAGGGATGATCG    16      0.0003549
 NO02G03790      GAGAACTTTTCATCCTCGCG    16      0.0003549
 NO01G05060      GTTGCCTCTTACCCCACCCA    15      0.0003327
 NO14G00420      TTGATTCGAAGAATGAGTGT    15      0.0003327
+.......         .......                 ....... ......
 ```
-## License
 
-         
+## License
+MIT
+
