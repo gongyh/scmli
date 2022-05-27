@@ -22,12 +22,12 @@ git clone https://github.com/gongyh/scmli.git
 
 ### Software Requirements
 
-Python3
-biopython 1.78 (python package)
-pandas 1.4.2 (python package)
-argparse 1.1 (python package)
-fastqc 0.11.9 
-trim_galore 0.6.7
+Python3<br />
+biopython 1.78 (python package)<br />
+pandas 1.4.2 (python package)<br />
+argparse 1.1 (python package)<br />
+fastqc 0.11.9<br />
+trim_galore 0.6.7<br />
 
 To install python package:
 ```
@@ -62,7 +62,7 @@ optional arguments:
   -o OUTPUT_DIR, --output_dir OUTPUT_DIR
 ```
 ## Results
-percent.stats: the counts and percent of target sequences
+percent.stats: show the counts and percent of target sequences
 ```
 gene_id	 sequence        counts  percent
 NO12G02480      TCTATCTCAACAGCCACCCG    17      0.0003771
