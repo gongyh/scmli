@@ -9,6 +9,7 @@ Single cell mutant library inspection
 - [Install](#install)
 - [Usage](#usage)
 - [Arguments](#arguments)
+- [Results](#results)
 - [License](#license)
 
 ## Background
@@ -18,13 +19,33 @@ Identification and description of gRNA mutant library
 ```
 git clone https://github.com/gongyh/scmli.git
 ```
+
+### Software Requirements
+
+Python3
+biopython 1.78 (python package)
+pandas 1.4.2 (python package)
+argparse 1.1 (python package)
+fastqc 0.11.9 
+trim_galore 0.6.7
+
+To install python package:
+```
+pip install -r requirements.txt
+```
+To install software:
+```
+conda install -c bioconda fastqc
+conda install -c bioconda trim_galore
+```
+
 ## Usage
 ```
 required: sequence(.fq.gz), gRNA library(.csv), fixed sequence(str)
 
 useage: scmli.py [-h] [-m {PCR,TEST}] -l LIB [-s SEQ] [-r1 READ1] [-r2 READ2] [-n PROJECT_NAME] [-o OUTDIR]
                 
-example: scmli.py -m PCR -l NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC -r1 test1.fq.gz -r2 test2.fq.gz
+example: scmli.py -m PCR -l ../test/NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC -r1 ../test/test1.fq.gz -r2 ../test/test2.fq.gz 
 ```
 
 ## Arguments
@@ -40,8 +61,17 @@ optional arguments:
   -n OUTPUT_NAME, --output_name OUTPUT_NAME
   -o OUTPUT_DIR, --output_dir OUTPUT_DIR
 ```
-
-
+## Results
+percent.stats: the counts and percent of target sequences
+```
+gene_id	 sequence        counts  percent
+NO12G02480      TCTATCTCAACAGCCACCCG    17      0.0003771
+NO03G04750      ACTTCCTGGTCCTCCCACGA    17      0.0003771
+NO08G01490      TGCCTCAGGAGGGATGATCG    16      0.0003549
+NO02G03790      GAGAACTTTTCATCCTCGCG    16      0.0003549
+NO01G05060      GTTGCCTCTTACCCCACCCA    15      0.0003327
+NO14G00420      TTGATTCGAAGAATGAGTGT    15      0.0003327
+```
 ## License
 
          

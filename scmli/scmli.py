@@ -14,7 +14,7 @@ def create_arg_parser():
     parser.add_argument('-r1', '--read1', required =True)
     parser.add_argument('-r2', '--read2', required =True)
     parser.add_argument('-n', '--output_name', default = 'my_project')
-    parser.add_argument('-o', '--output_dir', default=os.getcwd())
+    parser.add_argument('-o', '--output_dir', default="output")
 
     return parser
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     if args.model == "PCR":
         pcr_qc(args.output_dir, args.output_name, args.read1, args.read2)
         pcr_count(args.output_name + ".fq", args.lib, args.seq)
-        print(args)
+        print("Finished!")
     elif args.model == "TEST":
         try:        
             print(args)
