@@ -36,16 +36,16 @@ pip install -r requirements.txt
 To install software:
 ```
 conda install -c bioconda fastqc
-conda install -c bioconda trim_galore
+conda install -c bioconda trim-galore
 ```
 
 ## Usage
 ```
 required: sequence(.fq.gz), gRNA library(.csv), fixed sequence(str)
 
-useage: scmli.py [-h] [-m {PCR,TEST}] -l LIB [-s SEQ] [-r1 READ1] [-r2 READ2] [-n PROJECT_NAME] [-o OUTDIR]
+usage: scmli.py [-h] [-m {PCR,TEST}] -l LIB [-s SEQ] [-r1 READ1] [-r2 READ2] [-n PROJECT_NAME] [-o OUTDIR]
                 
-example: scmli.py -m PCR -l ../test/NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC -r1 ../test/test1.fq.gz -r2 ../test/test2.fq.gz 
+example: python3 scmli.py -m PCR -l ../test/NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC -r1 ../test/test1.fq.gz -r2 ../test/test2.fq.gz 
 ```
 
 ## Arguments
