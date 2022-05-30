@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import argparse, os
-from pcr_pipline import pcr_qc, pcr_count
-from parse_gRNA import parse_gRNA
+from scmli.pcr_pipline import pcr_qc, pcr_count
+from scmli.parse_gRNA import parse_gRNA
 import pandas as pd
 
 def create_arg_parser():

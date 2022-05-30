@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-from parse_gRNA import parse_gRNA
+from scmli.parse_gRNA import parse_gRNA
 import pandas as pd
 
 def pcr_qc(output_dir, output_name, read1, read2):

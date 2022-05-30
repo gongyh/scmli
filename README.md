@@ -47,13 +47,13 @@ required: sequence(.fq.gz), gRNA library(.csv), fixed sequence(str)
 
 usage: scmli.py [-h] [-m {PCR,TEST}] -l LIB [-s SEQ] [-r1 READ1] [-r2 READ2] [-n PROJECT_NAME] [-o OUTDIR]
                 
-example: python3 scmli.py -m PCR -l ../test/NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC -r1 ../test/test1.fq.gz -r2 ../test/test2.fq.gz 
+
 ```
 
 ## Test
 ```
-cd {dir of scmli} #
-python3 scmli/scmli.py -m PCR -l test/NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC -r1 test/test1.fq.gz -r2 test/test2.fq.gz -o {output_dir}
+cd scmli #
+python3 scmli/scmli.py -m PCR -l test/NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC -r1 test/test1.fq.gz -r2 test/test2.fq.gz -o output_dir
 ```
 
 ## Arguments

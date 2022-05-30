@@ -1,4 +1,4 @@
-Biopython==1.78
-pandas==1.4.2
-argparse==1.1
+Biopython>=1.76
+pandas
+argparse
 
