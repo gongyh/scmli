@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse, os
-from scmli.pcr_pipline import pcr_qc, pcr_count
-from scmli.parse_gRNA import parse_gRNA
+from scmli.pcr_pipline import pcr_qc, pcr_parse_gRNA, pcr_count
 import pandas as pd
 
 def create_arg_parser():
@@ -13,6 +12,7 @@ def create_arg_parser():
     parser.add_argument('-s', '--seq', required = True, help = "The fixed sequence for search")
     parser.add_argument('-r1', '--read1', required =True)
     parser.add_argument('-r2', '--read2', required =True)
+    parser.add_argument('-num', '--number', type = int, nargs = 2, default = [25, 45], help = "start and end of the gene position, '0 10' for the first ten" )
     parser.add_argument('-n', '--output_name', default = 'my_project')
     parser.add_argument('-o', '--output_dir', default="output")
 
@@ -40,11 +40,13 @@ if __name__ == "__main__":
         os._exit(0)
     if args.model == "PCR":
         pcr_qc(args.output_dir, args.output_name, args.read1, args.read2)
-        pcr_count(args.output_name + ".fq", args.lib, args.seq)
+        pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name)
+        pcr_count(args.output_name)
         print("Finished!")
     elif args.model == "TEST":
         try:        
             print(args)
+            print(args.number)
         except:
             print("test pipline error") 
     else:

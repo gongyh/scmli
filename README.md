@@ -53,7 +53,7 @@ usage: scmli.py [-h] [-m {PCR,TEST}] -l LIB [-s SEQ] [-r1 READ1] [-r2 READ2] [-n
 ## Test
 ```
 cd scmli #
-python3 scmli/scmli.py -m PCR -l test/NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC -r1 test/test1.fq.gz -r2 test/test2.fq.gz -o output_dir
+python3 scmli.py -m PCR -l test/NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC -r1 test/test1.fq.gz -r2 test/test2.fq.gz -o output_dir
 ```
 
 ## Arguments
