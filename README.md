@@ -33,54 +33,54 @@ trim_galore 0.6.7<br />
 
 Conda install software:
 ```
-conda install pandas
-conda install argparse
-conda install -c bioconda Biopython
-conda install -c bioconda fastqc
-conda install -c bioconda trim-galore
+conda install -c bioconda pandas argparse biopython fastqc trim-galore
 ```
-You could also install software by other methods
+You could also install dependencies by other methods.
 
 ## Usage
 ```
 required: sequence(.fq.gz), gRNA library(.csv), fixed sequence(str)
 
 usage: scmli.py [-h] [-m {PCR,TEST}] -l LIB [-s SEQ] [-r1 READ1] [-r2 READ2] [-n PROJECT_NAME] [-o OUTDIR]
-                
 
 ```
 
 ## Test
 ```
 cd scmli #
-python3 scmli.py -m PCR -l test/NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC -r1 test/test1.fq.gz -r2 test/test2.fq.gz -o output_dir
+python3 scmli.py -m PCR \
+  -l test/NoIMET1_gRNAs.csv \
+  -s GGTAGAATTGGTCGTTGCCATCGACCAGGC \
+  -r1 test/test_R1.fq.gz \
+  -r2 test/test_R2.fq.gz \
+  -o output_dir
 ```
 
 ## Arguments
 ```
 optional arguments:
-  -h, --help            show this help message and exit
-  -m {PCR,TEST}, --model {PCR,TEST}
-  -l LIB, --lib LIB
-  -s SEQ, --seq SEQ     The fixed sequence for search
-  -r1 READ1, --read1 READ1
-  -r2 READ2, --read2 READ2
-  -n OUTPUT_NAME, --output_name OUTPUT_NAME
-  -o OUTPUT_DIR, --output_dir OUTPUT_DIR
+  -h, --help                                 Show this help message and exit
+  -m {PCR,TEST}, --model {PCR,TEST}          XXX
+  -l LIB, --lib LIB                          XXX
+  -s SEQ, --seq SEQ                          The fixed sequence for search
+  -r1 READ1, --read1 READ1                   XXX
+  -r2 READ2, --read2 READ2                   XXX
+  -n OUTPUT_NAME, --output_name OUTPUT_NAME  XXX
+  -o OUTPUT_DIR, --output_dir OUTPUT_DIR     XXX
 ```
 
 ## Results
 percent.stats: show the counts and percent of target sequences
-```
-gene_id	 sequence        counts  percent
-NO12G02480      TCTATCTCAACAGCCACCCG    17      0.0003771
-NO03G04750      ACTTCCTGGTCCTCCCACGA    17      0.0003771
-NO08G01490      TGCCTCAGGAGGGATGATCG    16      0.0003549
-NO02G03790      GAGAACTTTTCATCCTCGCG    16      0.0003549
-NO01G05060      GTTGCCTCTTACCCCACCCA    15      0.0003327
-NO14G00420      TTGATTCGAAGAATGAGTGT    15      0.0003327
-.......         .......                 ....... ......
-```
+
+| gene_id | sequence | counts | percent |
+| NO12G02480 | TCTATCTCAACAGCCACCCG | 17 | 0.0003771 |
+| NO03G04750 | ACTTCCTGGTCCTCCCACGA | 17 | 0.0003771 |
+| NO08G01490 | TGCCTCAGGAGGGATGATCG | 16 | 0.0003549 |
+| NO02G03790 | GAGAACTTTTCATCCTCGCG | 16 | 0.0003549 |
+| NO01G05060 | GTTGCCTCTTACCCCACCCA | 15 | 0.0003327 |
+| NO14G00420 | TTGATTCGAAGAATGAGTGT | 15 | 0.0003327 |
+| ....... | ....... | ....... | ...... |
+
 
 ## License
 MIT
