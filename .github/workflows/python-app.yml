@@ -22,7 +22,7 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
-        python-version: "3.10"
+        python-version: "3.9"
     - name: Bash
       shell: bash -l {0}
       run: |
@@ -38,7 +38,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         conda config --add channels bioconda
-        conda install -c bioconda pandas argparse biopython fastqc trim-galore
+        conda install pandas 
+        conda install biopython 
+        conda install fastqc 
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
