@@ -38,7 +38,7 @@ jobs:
         conda list 
     - name: Install dependencies
       run: |
-        conda install -n test pandas biopython argparse fastqc trim-galore flake8 pytest
+        conda install -n test pandas biopython fastqc trim-galore flake8 pytest
     - name: Check out repository code
       uses: actions/checkout@v3
     - name: Lint with flake8
