@@ -1,20 +1,30 @@
 #!/usr/bin/env python3
 
-import argparse, os
+import argparse
+import os
 from scmli.pcr_pipline import pcr_qc, pcr_parse_gRNA, pcr_count
 import pandas as pd
 
+
 def create_arg_parser():
 
-    parser = argparse.ArgumentParser(description = "single cell mutant library inspertion")
-    parser.add_argument('-m', '--model', default = "TEST", choices = ["PCR", "TEST"])
-    parser.add_argument('-l', '--lib', required = True)
-    parser.add_argument('-s', '--seq', required = True, help = "The fixed sequence for search")
-    parser.add_argument('-r1', '--read1', required =True)
-    parser.add_argument('-r2', '--read2', required =True)
-    parser.add_argument('-num', '--number', type = int, nargs = 2, default = [25, 45], help = "start and end of the gene position, '0 10' for the first ten" )
-    parser.add_argument('-n', '--output_name', default = 'my_project')
-    parser.add_argument('-o', '--output_dir', default="output")
+    parser = argparse.ArgumentParser(
+        description="single cell mutant library inspertion")
+    parser.add_argument('-m', '--model', default="TEST",
+                        choices=["PCR", "TEST"], help="Choose analysis model")
+    parser.add_argument('-l', '--lib', required=True, help="Gene library")
+    parser.add_argument('-s', '--seq', required=True,
+                        help="The fixed sequence for search")
+    parser.add_argument('-r1', '--read1', required=True, help="Read1")
+    parser.add_argument('-r2', '--read2', required=True, help="Read2")
+    parser.add_argument('-num', '--number', type=int, nargs=2,
+                        default=[25, 45],
+                        help="Start and end of the gene position, \
+                        '0 10' for the first ten")
+    parser.add_argument('-n', '--output_name', default='my_project',
+                        help="Prefix of output files")
+    parser.add_argument('-o', '--output_dir', default="output",
+                        help="Directory of output files")
 
     return parser
 
@@ -44,10 +54,10 @@ if __name__ == "__main__":
         pcr_count(args.output_name)
         print("Finished!")
     elif args.model == "TEST":
-        try:        
+        try:
             print(args)
             print(args.number)
         except:
-            print("test pipline error") 
+            print("test pipline error")
     else:
         print("model")

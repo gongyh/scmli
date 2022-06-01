@@ -30,7 +30,9 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Install other conda softwares
       run: |
-        # install fastqc and trim_galore
+        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+        bash Miniconda3-latest-Linux-x86_64.sh
+        conda list
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
