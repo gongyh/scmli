@@ -24,16 +24,15 @@ git clone https://github.com/gongyh/scmli.git
 ### Software Requirements
 
 Miniconda3<br />
-Python 3.x <br />
+Python 3.9 <br />
 Biopython 1.78 (python package)<br />
 pandas 1.4.2 (python package)<br />
-argparse 1.1 (python package)<br />
 fastqc 0.11.9<br />
 trim_galore 0.6.7<br />
 
 Conda install software:
 ```
-conda install -c bioconda pandas argparse biopython fastqc trim-galore
+conda install -c bioconda pandas biopython fastqc trim-galore
 ```
 You could also install dependencies by other methods.
 

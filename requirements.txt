@@ -1,4 +1,2 @@
 Biopython>=1.76
 pandas
-argparse
-conda
