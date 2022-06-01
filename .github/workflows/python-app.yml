@@ -53,4 +53,4 @@ jobs:
       shell: bash -l {0}
       run: |
         cd ${{ github.workspace }}/test
-        pytest
+        python ../scmli.py -m PCR -l test/NoIMET1_gRNAs.csv -s GGTAGAATTGGTCGTTGCCATCGACCAGGC -r1 test/test_R1.fq.gz -r2 test/test_R2.fq.gz
