@@ -20,11 +20,11 @@ def create_arg_parser():
     parser.add_argument('-num', '--number', type=int, nargs=2,
                         default=[25, 45],
                         help="Start and end of the gene position, \
-                        '0 10' for the first ten")
-    parser.add_argument('-n', '--output_name', default='my_project',
-                        help="Prefix of output files")
+                        '0 10' for the first ten, default='25 45'")
+    parser.add_argument('-n', '--output_name', default="my_project",
+                        help="Prefix of output files, default='my_project'")
     parser.add_argument('-o', '--output_dir', default="output",
-                        help="Directory of output files")
+                        help="Directory of output files, default='output'")
 
     return parser
 
