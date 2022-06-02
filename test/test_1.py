@@ -3,8 +3,8 @@ import sys
 import os
 import argparse
 import pandas as pd
-sys.path.append("../lib")
-from pcr_pipeline import pcr_qc, pcr_parse_gRNA, pcr_count
+sys.path.append("..")
+from libs.pcr_pipeline import pcr_qc, pcr_parse_gRNA, pcr_count
 
 def test_pcr():
     '''

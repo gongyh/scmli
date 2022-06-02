@@ -2,7 +2,7 @@
 
 import argparse
 import os
-from lib.pcr_pipeline import pcr_qc, pcr_parse_gRNA, pcr_count
+from libs.pcr_pipeline import pcr_qc, pcr_parse_gRNA, pcr_count
 import pandas as pd
 
 
