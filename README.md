@@ -68,9 +68,9 @@ optional arguments:
   -num NUMBER NUMBER, --number NUMBER NUMBER Start and end of the gene position, '0 10' for the first ten
                                              default = "25 45"
   -n OUTPUT_NAME, --output_name OUTPUT_NAME  Prefix of output files
-                                             default = "output"
-  -o OUTPUT_DIR, --output_dir OUTPUT_DIR     Directory of output files
                                              default = "my_project"
+  -o OUTPUT_DIR, --output_dir OUTPUT_DIR     Directory of output files
+                                             default = "output"
 ```
 
 ## Results
