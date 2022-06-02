@@ -6,8 +6,8 @@ Single cell mutant library inspection
 
 - [Background](#background)
 - [Install](#install)
-- [Usage](#usage)
 - [Arguments](#arguments)
+- [Usage](#usage)
 - [Results](#results)
 - [License](#license)
 
@@ -44,16 +44,6 @@ required: reads(.fq.gz), gene library(.csv), fixed sequence(str), location numbe
 usage: scmli.py [-h] [-m {PCR,TEST}] -l LIB -s SEQ -r1 READ1 -r2 READ2 [-num NUMBER NUMBER] [-n OUTPUT_NAME] [-o OUTPUT_DIR]
 ```
 
-## Test
-```
-cd scmli 
-python3 scmli.py -m PCR \
-  -l test/NoIMET1_gRNAs.csv \
-  -s GGTAGAATTGGTCGTTGCCATCGACCAGGC \
-  -r1 test/test_R1.fq.gz \
-  -r2 test/test_R2.fq.gz
-```
-
 ## Arguments
 ```
 required arguments:
@@ -73,7 +63,19 @@ optional arguments:
                                              default = "output"
 ```
 
+## Test
+```
+cd scmli
+python3 scmli.py -m PCR \
+  -l test/NoIMET1_gRNAs.csv \
+  -s GGTAGAATTGGTCGTTGCCATCGACCAGGC \
+  -r1 test/test_R1.fq.gz \
+  -r2 test/test_R2.fq.gz
+```
+
 ## Results
+fastq_file<br />
+my_project.counts<br />
 my_project.percent: show the counts and percent of target sequences
 
 | gene_id    | sequence             | counts  | percent   |

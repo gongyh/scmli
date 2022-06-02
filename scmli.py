@@ -2,7 +2,7 @@
 
 import argparse
 import os
-from scmli.pcr_pipeline import pcr_qc, pcr_parse_gRNA, pcr_count
+from scmli_lib.pcr_pipeline import pcr_qc, pcr_parse_gRNA, pcr_count
 import pandas as pd
 
 
