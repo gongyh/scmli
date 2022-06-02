@@ -1,5 +1,5 @@
 import pytest
-from ../scmli/pcr_pipline import pcr_qc, pcr_parse_gRNA, pcr_count
+from ../scmli.pcr_pipline import pcr_qc, pcr_parse_gRNA, pcr_count
 
 def test_pcr():
     '''
