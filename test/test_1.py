@@ -31,7 +31,6 @@ def test_pcr():
 
     # validate each step
 
-    os.makedirs(args.output_dir)
     pcr_qc(args.output_dir, args.output_name, args.read1, args.read2)
     num_gRNAs = pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name)
     pcr_count(args.output_name)
