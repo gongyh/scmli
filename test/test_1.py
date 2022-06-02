@@ -35,5 +35,5 @@ def test_pcr():
     pcr_qc(args.output_dir, args.output_name, args.read1, args.read2)
     num_gRNAs = pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name)
     pcr_count(args.output_name)
-    assert os.path.isfile(args.output_name".percent") == True
-    assert os.path.getsize(args.output_name".percent") > 100
+    assert os.path.isfile(args.output_name + ".percent") == True
+    assert os.path.getsize(args.output_name + ".percent") > 100
