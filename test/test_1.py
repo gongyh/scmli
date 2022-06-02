@@ -4,7 +4,7 @@ import os
 import argparse
 import pandas as pd
 sys.path.append("..")
-from scmli_lib.pcr_pipeline import pcr_qc, pcr_parse_gRNA, pcr_count
+from lib.pcr_pipeline import pcr_qc, pcr_parse_gRNA, pcr_count
 
 def test_pcr():
     '''
