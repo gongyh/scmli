@@ -25,6 +25,8 @@ def create_arg_parser():
                         help="Prefix of output files, default='my_project'")
     parser.add_argument('-o', '--output_dir', default="output",
                         help="Directory of output files, default='output'")
+    parser.add_argument('-p', '--path', nargs='*',
+                        help="Path for softwares, <path1> <path2> ...")
 
     return parser
 
@@ -39,6 +41,8 @@ def check_args(parser):
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
     args.output_dir = os.path.abspath(args.output_dir)
+    for i in range(0, len(args.path)):
+        os.environ["PATH"] += os.pathsep + os.path.abspath(args.path[i])
 
     return args
 
