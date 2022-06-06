@@ -2,28 +2,30 @@
 
 import os, sys
 import pandas as pd
+import numpy as np
 from Bio import SeqIO
 from Bio.Seq import Seq
 
 
-def pcr_qc(output_dir, output_name, read1, read2):
+def pcr_qc(output_dir, project_name, read1, read2):
     #fastqc
-    os.chdir(output_dir)
-    os.system('fastqc -o ' + output_dir + ' ' + read1 + ' ' + read2)
-    
+    print("fastqc......")
+    os.system('fastqc -o ' + output_dir + ' ' + read1 + ' ' + read2 + "> pcr_pipeline.log 2>&1")
+
     #trim
-    print("trim_galore")
-    os.system('trim_galore --paired --fastqc --max_n 0 -j 4 --gzip ' + read1 + ' ' + read2)
+    print("trim_galore......")
+    os.system('trim_galore --paired --fastqc --max_n 0 -j 4 --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
 
     #jieya hebing
     name1 = read1.split('/')[-1]
     name1 = name1.split(".fq.gz")[0] + "_val_1.fq.gz"
     name2 = read2.split('/')[-1]
     name2 = name2.split(".fq.gz")[0] + "_val_2.fq.gz"
-    os.system('gzip -cd ' + name1 + ' ' + name2 + ' > ' + output_name + '.fq')
+    os.system('gzip -cd ' + name1 + ' ' + name2 + ' > ' + project_name + '.fq')
     
 
 def pcr_parse_gRNA(lib, fix_seq, number, project_name):
+    print("search......")
     header = True
     gRNA_gene = {}
     with open(lib) as fh:
@@ -58,9 +60,9 @@ def pcr_parse_gRNA(lib, fix_seq, number, project_name):
 
 
 def pcr_count(project_name) :
-    #parse_gRNA(fqfile, lib, fix_seq)
-    #os.system('python3 parse_gRNA.py my_project.fq NoIMET1_gRNAs.csv GGTAGAATTGGTCGTTGCCATCGACCAGGC > counts.stats')
-
+    
+    #fixed_seq GGTAGAATTGGTCGTTGCCATCGACCAGGC 
+    print("stats......")
     df1 = pd.read_csv(project_name + ".counts", sep = "\t", header = None, names = ["gene_id", "sequence", "counts", "percent"])
     t = df1["counts"].sum()
     df1["percent"] = df1["counts"]/t
@@ -68,3 +70,13 @@ def pcr_count(project_name) :
     df1 = df1.sort_values(by="counts", ascending = False)
     df1.to_csv(project_name + ".percent", sep = "\t", index = False)
 
+    stats = {}
+    stats["all_kinds"] = len(df1)
+    #stats["lib_kinds"] = 9710
+    #stats["un_kinds"] = len(df1[df1["gene_id"]=="unknow"])
+    #stats["no_kinds"] = len(df1[df1["gene_id"]!="unknow"])
+    #stats["no_sum"] = np.sum(df1[df1["gene_id"]!="unknow"]["counts"])
+    #stats["no_average"] = np.average(df1[df1["gene_id"]!="unknow"]["counts"])
+    #stats["no_coverage"] = stats["no_kinds"]/9710
+    
+    return stats

@@ -29,8 +29,10 @@ def create_arg_parser():
     return parser
 
 
-def parse_args(parser):
+def check_args(parser):
+    #parse args
     args = parser.parse_args()
+    #check and modify args
     args.read1 = os.path.abspath(args.read1)
     args.read2 = os.path.abspath(args.read2)
     args.lib = os.path.abspath(args.lib)
@@ -44,14 +46,17 @@ def parse_args(parser):
 if __name__ == "__main__":
     try:
         parser = create_arg_parser()
-        args = parse_args(parser)
+        args = check_args(parser)
     except:
         print("parser error")
         os._exit(0)
     if args.model == "PCR":
+        current_dir = os.getcwd()
+        os.chdir(args.output_dir)
         pcr_qc(args.output_dir, args.output_name, args.read1, args.read2)
         pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name)
         pcr_count(args.output_name)
+        os.chdir(current_dir)
         print("Finished!")
     elif args.model == "TEST":
         try:
