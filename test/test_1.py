@@ -34,7 +34,7 @@ def test_pcr():
     os.chdir(args.output_dir)
     pcr_qc(args.output_dir, args.output_name, args.read1, args.read2)
     pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name)
-    pcr_count(args.output_name)
-    os.chdir(current_dir)
+    stats = pcr_count(args.output_name)
     assert os.path.isfile(args.output_name + ".percent") == True
     assert stats["all_kinds"] == 12308
+    os.chdir(current_dir)
