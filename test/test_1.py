@@ -37,4 +37,4 @@ def test_pcr():
     pcr_count(args.output_name)
     os.chdir(current_dir)
     assert os.path.isfile(args.output_name + ".percent") == True
-    assert status["all_kinds"] == 12308
+    assert stats["all_kinds"] == 12308
