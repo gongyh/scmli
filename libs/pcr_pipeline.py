@@ -38,7 +38,7 @@ def pcr_qc(project_name, read1, read2, path_fastqc, path_trim_galore, threads):
     name2 = name2.split(".fq.gz")[0] + "_val_2.fq.gz"
     os.system('gzip -cd ' + name1 + ' ' + name2 + ' > ' + project_name + '.fq')
 
-def pcr_parse_gRNA(lib, fix_seq, number, project_name):
+def pcr_parse_gRNA(lib, fix_seq, number, project_name, threads):
     '''
     lib = args.lib (file.csv)
     fix_seq = args.seq ("GGTAGAATTGGTCGTTGCCATCGACCAGGC")
