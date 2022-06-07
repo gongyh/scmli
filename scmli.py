@@ -73,7 +73,7 @@ if __name__ == "__main__":
         current_dir = os.getcwd()
         os.chdir(args.output_dir)
         pcr_qc(args.output_name, args.read1, args.read2, args.path_fastqc, args.path_trim_galore, args.threads)
-        pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name)
+        pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name, args.threads)
         pcr_count(args.output_name)
         os.chdir(current_dir)
         print("Finished!")

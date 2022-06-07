@@ -76,14 +76,15 @@ def pcr_parse_gRNA(lib, fix_seq, number, project_name, threads):
                 else:
                     gRNAs_dict[gRNA] = 1
 
+
+    df1 = pd.DataFrame(columns=["gene_id", "sequence", "counts"])
     for k, v in gRNAs_dict.items():
         gene = "unknow"
-        f = open(project_name + ".counts", "a") #need fix
         if k in gRNA_gene.keys():
             gene = gRNA_gene[k]
-        print("%s\t%s\t%d"%(gene,k,v), file = f)
-    
-
+        ## method
+        df1 = pd.concat([df1, pd.DataFrame([[gene, k, v]], columns=["gene_id", "sequence", "counts"])])
+    df1.to_csv(project_name+".counts", index = False, header = None, sep = "\t")
 
 
 def pcr_count(project_name) :
