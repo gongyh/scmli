@@ -7,7 +7,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 
 
-def pcr_qc(project_name, read1, read2):
+def pcr_qc(project_name, read1, read2, path_fastqc, path_trim_galore):
     '''
     '''
     #fastqc
