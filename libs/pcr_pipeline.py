@@ -7,14 +7,16 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 
 
-def pcr_qc(output_dir, project_name, read1, read2):
+def pcr_qc(project_name, read1, read2):
+    '''
+    '''
     #fastqc
     print("fastqc......")
-    os.system('fastqc -o ' + output_dir + ' ' + read1 + ' ' + read2 + "> pcr_pipeline.log 2>&1")
+    os.system('fastqc -o ' + output_dir + ' ' + read1 + ' ' + read2 + "> pcr_pipeline.log 2>&1") # if FASTQC_PATH, fix
 
     #trim
     print("trim_galore......")
-    os.system('trim_galore --paired --fastqc --max_n 0 -j 4 --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
+    os.system('trim_galore --paired --fastqc --max_n 0 -j 4 --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1") # if XX, fix
 
     #jieya hebing
     name1 = read1.split('/')[-1]
@@ -22,9 +24,11 @@ def pcr_qc(output_dir, project_name, read1, read2):
     name2 = read2.split('/')[-1]
     name2 = name2.split(".fq.gz")[0] + "_val_2.fq.gz"
     os.system('gzip -cd ' + name1 + ' ' + name2 + ' > ' + project_name + '.fq')
-    
 
 def pcr_parse_gRNA(lib, fix_seq, number, project_name):
+    '''
+    XXX
+    '''
     print("search......")
     header = True
     gRNA_gene = {}
@@ -41,6 +45,10 @@ def pcr_parse_gRNA(lib, fix_seq, number, project_name):
     fix_seq_len = len(fix_seq)
     gRNAs_dict = {}
 
+    ## extract core function as a function, def core_func(param1,param2): XXX
+    ## define thread pool, p = Pool(threads)
+    ## map and reduce, p.map(core_func, [inputs])
+
     with open(project_name + ".fq") as handle:
         for record in SeqIO.parse(handle, "fastq"):
             seq = str(record.seq)
@@ -51,17 +59,20 @@ def pcr_parse_gRNA(lib, fix_seq, number, project_name):
                     gRNAs_dict[gRNA] += 1
                 else:
                     gRNAs_dict[gRNA] = 1
+
     for k, v in gRNAs_dict.items():
         gene = "unknow"
-        f = open(project_name + ".counts", "a")
+        f = open(project_name + ".counts", "a") #need fix
         if k in gRNA_gene.keys():
             gene = gRNA_gene[k]
         print("%s\t%s\t%d"%(gene,k,v), file = f)
 
 
 def pcr_count(project_name) :
-    
-    #fixed_seq GGTAGAATTGGTCGTTGCCATCGACCAGGC 
+    '''
+    XXX
+    '''
+    #fixed_seq, e.g. GGTAGAATTGGTCGTTGCCATCGACCAGGC
     print("stats......")
     df1 = pd.read_csv(project_name + ".counts", sep = "\t", header = None, names = ["gene_id", "sequence", "counts", "percent"])
     t = df1["counts"].sum()

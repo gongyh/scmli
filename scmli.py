@@ -27,6 +27,8 @@ def create_arg_parser():
                         help="Directory of output files, default='output'")
     parser.add_argument('-p', '--path', nargs='*',
                         help="Path for softwares, <path1> <path2> ...")
+    pass # fastqc
+    pass # trim-galore
 
     return parser
 
@@ -41,9 +43,9 @@ def check_args(parser):
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
     args.output_dir = os.path.abspath(args.output_dir)
-    for i in range(0, len(args.path)):
-        os.environ["PATH"] += os.pathsep + os.path.abspath(args.path[i])
-
+    #for i in range(0, len(args.path)):
+    #    os.environ["PATH"] += os.pathsep + os.path.abspath(args.path[i])
+    pass #check existence of software
     return args
 
 
@@ -57,7 +59,7 @@ if __name__ == "__main__":
     if args.model == "PCR":
         current_dir = os.getcwd()
         os.chdir(args.output_dir)
-        pcr_qc(args.output_dir, args.output_name, args.read1, args.read2)
+        pcr_qc(args.output_name, args.read1, args.read2)
         pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name)
         pcr_count(args.output_name)
         os.chdir(current_dir)

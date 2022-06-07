@@ -12,7 +12,8 @@ Single cell mutant library inspection
 - [License](#license)
 
 ## Background
-Identification and description of gRNA mutant library 
+
+Identification and description of gRNA mutant library.
 
 ## Install
 
@@ -22,32 +23,32 @@ git clone https://github.com/gongyh/scmli.git
 
 ### Software Requirements
 
-Miniconda3<br />
-Python 3.X (3.9)<br />
+Python3 (3.9)<br />
 Biopython (1.79) (python package)<br />
 pandas (1.4.2) (python package)<br />
 argparse (python package, only needed if python<=3.6)<br />
 fastqc (0.11.9)<br />
 trim-galore>=0.6.0 (0.6.7)<br />
 
-The test version is in parentheses
+The tested versions are given in parentheses.
 
 
-Conda install software:
+You can install these dependencies using Conda ([Miniconda3](https://docs.conda.io/en/latest/miniconda.html)):
 ```
 conda install -c bioconda pandas biopython fastqc trim-galore>=0.6.0
 ```
-You could also install dependencies by other methods.
 
 ## Usage
+
 Sclmi search `reads` which target sequence had been transferred in. It uses `fixed sequence` for filtering successfully transferred plasmid, then aligns 
-gene sequence with `gene library file`.<br /> <br />Target sequence contains fixed sequence and gene sequence, `number(a b)` is used to locate gene sequence
+gene sequence with `gene library file`. Target sequence contains fixed sequence and gene sequence, `number(a b)` is used to locate gene sequence.
 ```
 required: reads(.fq.gz), gene library(.csv), fixed sequence(str), location number(a b)
 usage: scmli.py [-h] [-m {PCR,TEST}] -l LIB -s SEQ -r1 READ1 -r2 READ2 [-num NUMBER NUMBER] [-n OUTPUT_NAME] [-o OUTPUT_DIR]
 ```
 
 ## Arguments
+
 ```
 required arguments:
   -m {PCR,TEST}, --model {PCR,TEST}          Choose analysis model
@@ -58,15 +59,16 @@ required arguments:
 
 optional arguments:
   -h, --help                                 Show this help message and exit
-  -num NUMBER NUMBER, --number NUMBER NUMBER Start and end of the gene position, '0 10' for the first ten
-                                             default = "25 45"
-  -n OUTPUT_NAME, --output_name OUTPUT_NAME  Prefix of output files
-                                             default = "my_project"
-  -o OUTPUT_DIR, --output_dir OUTPUT_DIR     Directory of output files
-                                             default = "output"
+  -t NUMBER, --threads NUMBER                Number of threads to use, default = 8
+  -num NUMBER NUMBER, --number NUMBER NUMBER Start and end of the gene position, '0 10' for the first ten, default = "25 45"
+  -n OUTPUT_NAME, --output_name OUTPUT_NAME  Prefix of output files, default = "my_project"
+  -o OUTPUT_DIR, --output_dir OUTPUT_DIR     Directory of output files, default = "output"
+  --FASTQC_PATH  FASTQC_PATH                 PATH to fastqc
+  --TRIM_GALORE_PATH TRIM_GALORE_PATH        PATH to trim-galore
 ```
 
 ## Test
+
 ```
 cd scmli
 python3 scmli.py -m PCR \
@@ -77,9 +79,10 @@ python3 scmli.py -m PCR \
 ```
 
 ## Results
-fastq_file<br />
-my_project.counts<br />
-my_project.percent: show the counts and percent of target sequences
+
+{OUTPUT_NAME}.fastqc.zip: fastqc results XXX <br />
+{OUTPUT_NAME}.counts:     count file XXXXX <br />
+{OUTPUT_NAME}.percent:    show the counts and percent of target sequences <br />
 
 | gene_id    | sequence             | counts  | percent   |
 | ---------- | -------------------- | ------- | --------- |
@@ -92,5 +95,6 @@ my_project.percent: show the counts and percent of target sequences
 | .......    | .......              | ....... | ......    |
 
 ## License
+
 MIT
 
