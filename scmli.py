@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import sys
 from libs.pcr_pipeline import pcr_qc, pcr_parse_gRNA, pcr_count
 import pandas as pd
 
@@ -23,10 +24,8 @@ def create_arg_parser():
                         help="Prefix of output files, default='my_project'")
     parser.add_argument('-o', '--output_dir', default="output",
                         help="Directory of output files, default='output'")
-    parser.add_argument('-p', '--path', nargs='*',
-                        help="Path for softwares, <path1> <path2> ...")
-    pass # fastqc
-    pass # trim-galore
+    parser.add_argument('-p1', '--path_fastqc', help="PATH to fastqc")
+    parser.add_argument('-p2', '--path_trim_galore', help="PATH to trim_galore")
 
     return parser
 
@@ -41,9 +40,27 @@ def check_args(parser):
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
     args.output_dir = os.path.abspath(args.output_dir)
-    #for i in range(0, len(args.path)):
-    #    os.environ["PATH"] += os.pathsep + os.path.abspath(args.path[i])
-    pass #check existence of software
+    #check software path
+    try: 
+        args.path_fastqc
+        if os.path.isdir(args.path_fastqc):
+            args.path_fastqc = os.path.abspath(args.path_fastqc)
+        else:
+            print("custom path to fastqc error")
+            sys.exit()
+    except:
+        pass
+
+    try:
+        args.path_trim_galore
+        if os.path.isdir(args.path_trim_galore):
+            args.path_trim_galore = os.path.abspath(args.path_trim_galore)
+        else:
+            print("custom path to trim_galore error")
+            sys.exit()
+    except:
+        pass
+
     return args
 
 
@@ -57,7 +74,7 @@ if __name__ == "__main__":
     if args.model == "PCR":
         current_dir = os.getcwd()
         os.chdir(args.output_dir)
-        pcr_qc(args.output_name, args.read1, args.read2)
+        pcr_qc(args.output_name, args.read1, args.read2, args.path_fastqc, args.path_trim_galore)
         pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name)
         pcr_count(args.output_name)
         os.chdir(current_dir)
