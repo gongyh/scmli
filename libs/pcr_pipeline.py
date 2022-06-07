@@ -20,9 +20,9 @@ def pcr_qc(project_name, read1, read2, path_fastqc, path_trim_galore, threads):
     #trim
     print("trim_galore......")
     if path_trim_galore:
-        os.system(path_trim_galore + 'trim_galore --paired --fastqc --max_n 0 -j ' + threads + ' --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
+        os.system(path_trim_galore + 'trim_galore --paired --fastqc --max_n 0 -j ' + str(threads) + ' --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
     else:
-        os.system('trim_galore --paired --fastqc --max_n 0 -j ' + threads + ' --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
+        os.system('trim_galore --paired --fastqc --max_n 0 -j ' + str(threads) + ' --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
 
     #jieya hebing
     name1 = read1.split('/')[-1]
