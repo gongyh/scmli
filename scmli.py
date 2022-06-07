@@ -42,19 +42,19 @@ def check_args(parser):
     args.output_dir = os.path.abspath(args.output_dir)
     #check software path 
     if args.path_fastqc:
-        if os.path.isdir(args.path_fastqc):
+        if os.path.isdir(args.path_fastqc) and (os.path.isfile(args.path_fastqc+"/fastqc") or os.path.isfile(args.path_fastqc+"fastqc")):
             args.path_fastqc = os.path.abspath(args.path_fastqc)
         else:
-            print("custom path to fastqc error")
+            print("path to fastqc error")
             os._exit(0)
     else:
         pass
 
     if args.path_trim_galore:
-        if os.path.isdir(args.path_trim_galore):
+        if os.path.isdir(args.path_trim_galore) and (os.path.isfile(args.path_trim_galore+"/trim_galore") or os.path.isfile(args.path_trim_galore+"trim_galore")):
             args.path_trim_galore = os.path.abspath(args.path_trim_galore)
         else:
-            print("custom path to trim_galore error")
+            print("path to trim_galore error")
             os._exit(0)
     else:
         pass

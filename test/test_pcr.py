@@ -13,7 +13,7 @@ def test_pcr():
     '''
     # parameters
     parser = create_arg_parser()
-    #parser = argparse.ArgumentParser()
+    
     args = parser.parse_args([
         '-m','PCR',
         '-l','NoIMET1_gRNAs.csv',

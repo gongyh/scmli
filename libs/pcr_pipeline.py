@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import os, sys
+import os
+import sys
 import pandas as pd
 import numpy as np
 from Bio import SeqIO
@@ -9,6 +10,12 @@ from Bio.Seq import Seq
 
 def pcr_qc(project_name, read1, read2, path_fastqc, path_trim_galore, threads):
     '''
+    project_name = args.output_name ("my_project")
+    read1 = args.read1 (file)
+    read2 = args.read2 (file)
+    path_fastqc = args.path_fastqc
+    path_trim_galore = args.path_trim_galore
+    threads = args.threads (8)
     '''
     #fastqc
     print("fastqc......")
@@ -20,7 +27,7 @@ def pcr_qc(project_name, read1, read2, path_fastqc, path_trim_galore, threads):
     #trim
     print("trim_galore......")
     if path_trim_galore:
-        os.system(path_trim_galore + 'trim_galore --paired --fastqc --max_n 0 -j ' + str(threads) + ' --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
+        os.system(path_trim_galore + '/trim_galore --paired --fastqc --max_n 0 -j ' + str(threads) + ' --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
     else:
         os.system('trim_galore --paired --fastqc --max_n 0 -j ' + str(threads) + ' --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
 
@@ -33,7 +40,10 @@ def pcr_qc(project_name, read1, read2, path_fastqc, path_trim_galore, threads):
 
 def pcr_parse_gRNA(lib, fix_seq, number, project_name):
     '''
-    XXX
+    lib = args.lib (file.csv)
+    fix_seq = args.seq ("GGTAGAATTGGTCGTTGCCATCGACCAGGC")
+    number = args.number ([25,45])
+    project_name = args.output_name ("my_project")
     '''
     print("search......")
     header = True
@@ -72,11 +82,13 @@ def pcr_parse_gRNA(lib, fix_seq, number, project_name):
         if k in gRNA_gene.keys():
             gene = gRNA_gene[k]
         print("%s\t%s\t%d"%(gene,k,v), file = f)
+    
+
 
 
 def pcr_count(project_name) :
     '''
-    XXX
+    project_name = args.output_name ("my_project")
     '''
     #fixed_seq, e.g. GGTAGAATTGGTCGTTGCCATCGACCAGGC
     print("stats......")
