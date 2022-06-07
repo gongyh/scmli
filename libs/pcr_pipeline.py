@@ -12,7 +12,7 @@ def pcr_qc(project_name, read1, read2):
     '''
     #fastqc
     print("fastqc......")
-    os.system('fastqc -o ' + output_dir + ' ' + read1 + ' ' + read2 + "> pcr_pipeline.log 2>&1") # if FASTQC_PATH, fix
+    os.system('fastqc -o . ' + read1 + ' ' + read2 + "> pcr_pipeline.log 2>&1") # if FASTQC_PATH, fix
 
     #trim
     print("trim_galore......")

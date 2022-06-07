@@ -1,2 +1,2 @@
-Biopython>=1.76
+Biopython
 pandas
