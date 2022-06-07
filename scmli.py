@@ -17,10 +17,8 @@ def create_arg_parser():
                         help="The fixed sequence for search")
     parser.add_argument('-r1', '--read1', required=True, help="Read1")
     parser.add_argument('-r2', '--read2', required=True, help="Read2")
-    parser.add_argument('-num', '--number', type=int, nargs=2,
-                        default=[25, 45],
-                        help="Start and end of the gene position, \
-                        '0 10' for the first ten, default='25 45'")
+    parser.add_argument('-num', '--number', type=int, nargs=2, default=[25, 45], 
+                        help="Start and end of the gene position, default='25 45', from the 26-th to the 45-th bases")
     parser.add_argument('-n', '--output_name', default="my_project",
                         help="Prefix of output files, default='my_project'")
     parser.add_argument('-o', '--output_dir', default="output",

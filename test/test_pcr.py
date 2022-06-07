@@ -5,22 +5,21 @@ import argparse
 import pandas as pd
 sys.path.append("..")
 from libs.pcr_pipeline import pcr_qc, pcr_parse_gRNA, pcr_count
+from scmli import create_arg_parser
 
 def test_pcr():
     '''
     Test PCR pipeline
     '''
     # parameters
-    parser = argparse.ArgumentParser()
-    args = parser.parse_args()
-    args.model='PCR'
-    args.lib='NoIMET1_gRNAs.csv'
-    args.seq='GGTAGAATTGGTCGTTGCCATCGACCAGGC'
-    args.read1='test_R1.fq.gz'
-    args.read2='test_R2.fq.gz'
-    args.number=[25, 45]
-    args.output_name='my_project'
-    args.output_dir='output'   
+    parser = create_arg_parser()
+    #parser = argparse.ArgumentParser()
+    args = parser.parse_args([
+        '-m','PCR',
+        '-l','NoIMET1_gRNAs.csv',
+        '-s','GGTAGAATTGGTCGTTGCCATCGACCAGGC',
+        '-r1','test_R1.fq.gz',
+        '-r2','test_R2.fq.gz'])
 
     args.read1 = os.path.abspath(args.read1)
     args.read2 = os.path.abspath(args.read2)
@@ -32,7 +31,7 @@ def test_pcr():
     # validate each step
     current_dir = os.getcwd()
     os.chdir(args.output_dir)
-    pcr_qc(args.output_dir, args.output_name, args.read1, args.read2)
+    pcr_qc(args.output_name, args.read1, args.read2)
     pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name)
     stats = pcr_count(args.output_name)
     assert os.path.isfile(args.output_name + ".percent") == True
