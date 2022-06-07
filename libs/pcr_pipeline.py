@@ -7,16 +7,22 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 
 
-def pcr_qc(project_name, read1, read2, path_fastqc, path_trim_galore):
+def pcr_qc(project_name, read1, read2, path_fastqc, path_trim_galore, threads):
     '''
     '''
     #fastqc
     print("fastqc......")
-    os.system('fastqc -o . ' + read1 + ' ' + read2 + "> pcr_pipeline.log 2>&1") # if FASTQC_PATH, fix
+    if path_fastqc:
+        os.system(path_fastqc + '/fastqc -o . ' + read1 + ' ' + read2 + "> pcr_pipeline.log 2>&1") 
+    else:
+        os.system('fastqc -o . ' + read1 + ' ' + read2 + "> pcr_pipeline.log 2>&1")
 
     #trim
     print("trim_galore......")
-    os.system('trim_galore --paired --fastqc --max_n 0 -j 4 --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1") # if XX, fix
+    if path_trim_galore:
+        os.system(path_trim_galore + 'trim_galore --paired --fastqc --max_n 0 -j ' + threads + ' --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
+    else:
+        os.system('trim_galore --paired --fastqc --max_n 0 -j ' + threads + ' --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
 
     #jieya hebing
     name1 = read1.split('/')[-1]

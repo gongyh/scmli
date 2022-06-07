@@ -2,7 +2,6 @@
 
 import argparse
 import os
-import sys
 from libs.pcr_pipeline import pcr_qc, pcr_parse_gRNA, pcr_count
 import pandas as pd
 
@@ -18,6 +17,7 @@ def create_arg_parser():
                         help="The fixed sequence for search")
     parser.add_argument('-r1', '--read1', required=True, help="Read1")
     parser.add_argument('-r2', '--read2', required=True, help="Read2")
+    parser.add_argument('-t', '--threads', type=int, default=8, help="Number of threads to use")
     parser.add_argument('-num', '--number', type=int, nargs=2, default=[25, 45], 
                         help="Start and end of the gene position, default='25 45', from the 26-th to the 45-th bases")
     parser.add_argument('-n', '--output_name', default="my_project",
@@ -40,25 +40,23 @@ def check_args(parser):
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
     args.output_dir = os.path.abspath(args.output_dir)
-    #check software path
-    try: 
-        args.path_fastqc
+    #check software path 
+    if args.path_fastqc:
         if os.path.isdir(args.path_fastqc):
             args.path_fastqc = os.path.abspath(args.path_fastqc)
         else:
             print("custom path to fastqc error")
-            sys.exit()
-    except:
+            os._exit(0)
+    else:
         pass
 
-    try:
-        args.path_trim_galore
+    if args.path_trim_galore:
         if os.path.isdir(args.path_trim_galore):
             args.path_trim_galore = os.path.abspath(args.path_trim_galore)
         else:
             print("custom path to trim_galore error")
-            sys.exit()
-    except:
+            os._exit(0)
+    else:
         pass
 
     return args
@@ -74,7 +72,7 @@ if __name__ == "__main__":
     if args.model == "PCR":
         current_dir = os.getcwd()
         os.chdir(args.output_dir)
-        pcr_qc(args.output_name, args.read1, args.read2, args.path_fastqc, args.path_trim_galore)
+        pcr_qc(args.output_name, args.read1, args.read2, args.path_fastqc, args.path_trim_galore, args.threads)
         pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name)
         pcr_count(args.output_name)
         os.chdir(current_dir)
