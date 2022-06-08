@@ -50,9 +50,6 @@ def pcr_parse_gRNA(lib, fix_seq, number, project_name, threads):
     gRNA_gene = {}
     with open(lib) as fh:
         for line in fh:
-            if header:
-                header = False
-                continue
             cl = line.split(",")
             gene = cl[0]
             gRNA = cl[1][number[0]:number[1]] 
@@ -85,6 +82,43 @@ def pcr_parse_gRNA(lib, fix_seq, number, project_name, threads):
         ## method
         df1 = pd.concat([df1, pd.DataFrame([[gene, k, v]], columns=["gene_id", "sequence", "counts"])])
     df1.to_csv(project_name+".counts", index = False, header = None, sep = "\t")
+
+
+'''
+gRNA_gene = {}
+
+def search1():
+    for line in fh:
+        cl = line.split(",")
+        gene = cl[0]
+        gRNA = cl[1][25:45]
+        gRNA_gene[gRNA] = gene
+
+with open("../test/NoIMET1_gRNAs.csv") as fh:
+    Pool(8).apply_async(search1)
+
+def search1():
+    cl = line.split(",")
+    gene = cl[0]
+    gRNA = cl[1][25:45]
+    gRNA_gene[gRNA] = gene
+
+with open("../test/NoIMET1_gRNAs.csv") as fh:
+    for line in fh:
+        Pool(8).apply_async(search1)
+
+gRNA_gene = {}
+
+def search1(line):
+    cl = line.split(",")
+    gene = cl[0]
+    gRNA = cl[1][25:45]
+    gRNA_gene[gRNA] = gene
+
+with open("../test/NoIMET1_gRNAs.csv") as fh:    
+    Pool(8).map(search1, [line for line in fh])
+
+'''
 
 
 def pcr_count(project_name) :

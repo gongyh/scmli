@@ -80,8 +80,8 @@ python3 scmli.py -m PCR \
 
 ## Results
 
-{OUTPUT_NAME}.fastqc.zip: fastqc results XXX <br />
-{OUTPUT_NAME}.counts:     count file XXXXX <br />
+{OUTPUT_NAME}.fastqc.zip: fastqc results  <br />
+{OUTPUT_NAME}.counts:     count file <br />
 {OUTPUT_NAME}.percent:    show the counts and percent of target sequences <br />
 
 | gene_id    | sequence             | counts  | percent   |
