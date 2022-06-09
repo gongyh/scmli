@@ -60,11 +60,11 @@ required arguments:
 optional arguments:
   -h, --help                                 Show this help message and exit
   -t NUMBER, --threads NUMBER                Number of threads to use, default = 8
-  -num NUMBER NUMBER, --number NUMBER NUMBER Start and end of the gene position, '0 10' for the first ten, default = "25 45"
+  --number NUMBER NUMBER                     Start and end of the gene position, '0 10' for the first ten, default = "25 45"
   -n OUTPUT_NAME, --output_name OUTPUT_NAME  Prefix of output files, default = "my_project"
   -o OUTPUT_DIR, --output_dir OUTPUT_DIR     Directory of output files, default = "output"
-  -p1, --path_fastqc PATH                    PATH to fastqc
-  -p2, --path_trim_galore PATH               PATH to trim-galore
+  --FASTQC_PATH                              PATH to fastqc
+  --TRIM_GALORE_PATH                         PATH to trim-galore
 ```
 
 ## Test

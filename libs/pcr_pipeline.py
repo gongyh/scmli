@@ -6,54 +6,51 @@ import pandas as pd
 import numpy as np
 from Bio import SeqIO
 from Bio.Seq import Seq
+from multiprocessing import Pool
 
-
-def pcr_qc(project_name, read1, read2, path_fastqc, path_trim_galore, threads):
+def pcr_qc(project_name, read1, read2, FASTQC_PATH=None, TRIM_GALORE_PATH=None, threads=8):
     '''
-    project_name = args.output_name ("my_project")
     read1 = args.read1 (file)
     read2 = args.read2 (file)
-    path_fastqc = args.path_fastqc
-    path_trim_galore = args.path_trim_galore
-    threads = args.threads (8)
     '''
     #fastqc
     print("fastqc......")
-    if path_fastqc:
-        os.system(path_fastqc + '/fastqc -o . ' + read1 + ' ' + read2 + "> pcr_pipeline.log 2>&1") 
+    if FASTQC_PATH:
+        FASTQC_BIN=FASTQC_PATH+"/fastqc"
     else:
-        os.system('fastqc -o . ' + read1 + ' ' + read2 + "> pcr_pipeline.log 2>&1")
+        FASTQC_BIN="fastqc"
+    os.system(FASTQC_BIN + ' -o . ' + read1 + ' ' + read2 + "> pcr_pipeline.log 2>&1") 
 
     #trim
     print("trim_galore......")
-    if path_trim_galore:
-        os.system(path_trim_galore + '/trim_galore --paired --fastqc --max_n 0 -j ' + str(threads) + ' --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
+    if TRIM_GALORE_PATH:
+        TRIM_GALORE_BIN=TRIM_GALORE_PATH+"/trim_galore"
     else:
-        os.system('trim_galore --paired --fastqc --max_n 0 -j ' + str(threads) + ' --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
-
-    #jieya hebing
+        TRIM_GALORE_BIN="trim_galore"
+    os.system(TRIM_GALORE_BIN + ' --paired --fastqc --max_n 0 -j ' + str(threads) + ' --gzip ' + read1 + ' ' + read2 + ">> pcr_pipeline.log 2>&1")
+ 
+   #jieya hebing
     name1 = read1.split('/')[-1]
     name1 = name1.split(".fq.gz")[0] + "_val_1.fq.gz"
     name2 = read2.split('/')[-1]
     name2 = name2.split(".fq.gz")[0] + "_val_2.fq.gz"
     os.system('gzip -cd ' + name1 + ' ' + name2 + ' > ' + project_name + '.fq')
 
-def pcr_parse_gRNA(lib, fix_seq, number, project_name, threads):
+def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name="my_project", threads=8):
+    
     '''
     lib = args.lib (file.csv)
     fix_seq = args.seq ("GGTAGAATTGGTCGTTGCCATCGACCAGGC")
-    number = args.number ([25,45])
-    project_name = args.output_name ("my_project")
+    
     '''
+
     print("search......")
-    header = True
+    pool = Pool(threads)
     gRNA_gene = {}
+    
     with open(lib) as fh:
-        for line in fh:
-            cl = line.split(",")
-            gene = cl[0]
-            gRNA = cl[1][number[0]:number[1]] 
-            gRNA_gene[gRNA] = gene
+        result = pool.map(search_a,[line for line in fh])
+        gRNA_gene.update(result)
 
     fix_seq_len = len(fix_seq)
     gRNAs_dict = {}
@@ -73,57 +70,23 @@ def pcr_parse_gRNA(lib, fix_seq, number, project_name, threads):
                 else:
                     gRNAs_dict[gRNA] = 1
 
+    with open(project_name+".counts", "w") as f:
+        for k, v in gRNAs_dict.items():
+            gene = "unknow"
+            if k in gRNA_gene.keys():
+                gene = gRNA_gene[k]
+            f.write("%s\t%s\t%d\n"%(gene,k,v))
 
-    df1 = pd.DataFrame(columns=["gene_id", "sequence", "counts"])
-    for k, v in gRNAs_dict.items():
-        gene = "unknow"
-        if k in gRNA_gene.keys():
-            gene = gRNA_gene[k]
-        ## method
-        df1 = pd.concat([df1, pd.DataFrame([[gene, k, v]], columns=["gene_id", "sequence", "counts"])])
-    df1.to_csv(project_name+".counts", index = False, header = None, sep = "\t")
-
-
-'''
-gRNA_gene = {}
-
-def search1():
-    for line in fh:
-        cl = line.split(",")
-        gene = cl[0]
-        gRNA = cl[1][25:45]
-        gRNA_gene[gRNA] = gene
-
-with open("../test/NoIMET1_gRNAs.csv") as fh:
-    Pool(8).apply_async(search1)
-
-def search1():
+def search_a(line, number=[25,45]):
     cl = line.split(",")
     gene = cl[0]
-    gRNA = cl[1][25:45]
-    gRNA_gene[gRNA] = gene
-
-with open("../test/NoIMET1_gRNAs.csv") as fh:
-    for line in fh:
-        Pool(8).apply_async(search1)
-
-gRNA_gene = {}
-
-def search1(line):
-    cl = line.split(",")
-    gene = cl[0]
-    gRNA = cl[1][25:45]
-    gRNA_gene[gRNA] = gene
-
-with open("../test/NoIMET1_gRNAs.csv") as fh:    
-    Pool(8).map(search1, [line for line in fh])
-
-'''
+    gRNA = cl[1][number[0]:number[1]]
+    result = (gRNA, gene)
+    return result
 
 
-def pcr_count(project_name) :
+def pcr_count(project_name):
     '''
-    project_name = args.output_name ("my_project")
     '''
     #fixed_seq, e.g. GGTAGAATTGGTCGTTGCCATCGACCAGGC
     print("stats......")

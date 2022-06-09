@@ -18,14 +18,14 @@ def create_arg_parser():
     parser.add_argument('-r1', '--read1', required=True, help="Read1")
     parser.add_argument('-r2', '--read2', required=True, help="Read2")
     parser.add_argument('-t', '--threads', type=int, default=8, help="Number of threads to use")
-    parser.add_argument('-num', '--number', type=int, nargs=2, default=[25, 45], 
+    parser.add_argument('--number', type=int, nargs=2, default=[25, 45], 
                         help="Start and end of the gene position, default='25 45', from the 26-th to the 45-th bases")
     parser.add_argument('-n', '--output_name', default="my_project",
                         help="Prefix of output files, default='my_project'")
     parser.add_argument('-o', '--output_dir', default="output",
                         help="Directory of output files, default='output'")
-    parser.add_argument('-p1', '--path_fastqc', help="PATH to fastqc")
-    parser.add_argument('-p2', '--path_trim_galore', help="PATH to trim_galore")
+    parser.add_argument('--FASTQC_PATH', help="PATH to fastqc")
+    parser.add_argument('--TRIM_GALORE_PATH', help="PATH to trim_galore")
 
     return parser
 
@@ -41,18 +41,18 @@ def check_args(parser):
         os.makedirs(args.output_dir)
     args.output_dir = os.path.abspath(args.output_dir)
     #check software path 
-    if args.path_fastqc:
-        if os.path.isdir(args.path_fastqc) and (os.path.isfile(args.path_fastqc+"/fastqc") or os.path.isfile(args.path_fastqc+"fastqc")):
-            args.path_fastqc = os.path.abspath(args.path_fastqc)
+    if args.FASTQC_PATH:
+        if os.path.isdir(args.FASTQC_PATH) and (os.path.isfile(args.FASTQC_PATH+"/fastqc") or os.path.isfile(args.FASTQC_PATH+"fastqc")):
+            args.FASTQC_PATH = os.path.abspath(args.FASTQC_PATH)
         else:
             print("path to fastqc error")
             os._exit(0)
     else:
         pass
 
-    if args.path_trim_galore:
-        if os.path.isdir(args.path_trim_galore) and (os.path.isfile(args.path_trim_galore+"/trim_galore") or os.path.isfile(args.path_trim_galore+"trim_galore")):
-            args.path_trim_galore = os.path.abspath(args.path_trim_galore)
+    if args.TRIM_GALORE_PATH:
+        if os.path.isdir(args.TRIM_GALORE_PATH) and (os.path.isfile(args.TRIM_GALORE_PATH+"/trim_galore") or os.path.isfile(args.TRIM_GALORE_PATH+"trim_galore")):
+            args.TRIM_GALORE_PATH = os.path.abspath(args.TRIM_GALORE_PATH)
         else:
             print("path to trim_galore error")
             os._exit(0)
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     if args.model == "PCR":
         current_dir = os.getcwd()
         os.chdir(args.output_dir)
-        pcr_qc(args.output_name, args.read1, args.read2, args.path_fastqc, args.path_trim_galore, args.threads)
+        pcr_qc(args.output_name, args.read1, args.read2, args.FASTQC_PATH, args.TRIM_GALORE_PATH, args.threads)
         pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name, args.threads)
         pcr_count(args.output_name)
         os.chdir(current_dir)
