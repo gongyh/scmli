@@ -56,18 +56,7 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name="my_project", thre
 
     fix_seq_len = len(fix_seq)
     gRNAs_dict = {}
-    '''
-
-    f = open(lib)
-    a = []
-    b = f.readlines()
-    c = number
-    for i in (0, len(b)-1):
-        a.append(([b[i]], c))
-
-    result = Pool(8).map(search_a, [a[i] for i in range(len(a)-1)])
-    gRNA_gene.update(result)
-    '''
+    
     ## extract core function as a function, def core_func(param1,param2): XXX
     ## define thread pool, p = Pool(threads)
     ## map and reduce, p.map(core_func, [inputs])
@@ -101,14 +90,6 @@ def search_a(number,line):
     result = (gRNA, gene)
     return result
 
-'''
-def search_a(line):
-    cl = line[0][0].split(",")
-    gene = cl[0]
-    gRNA = cl[1][line[1][0]:line[1][1]]
-    result = (gRNA, gene)
-    return result 
-'''
 
 def pcr_count(project_name):
     '''
