@@ -7,6 +7,7 @@ import numpy as np
 from Bio import SeqIO
 from Bio.Seq import Seq
 from multiprocessing import Pool
+from functools import partial
 
 def pcr_qc(project_name, read1, read2, FASTQC_PATH=None, TRIM_GALORE_PATH=None, threads=8):
     '''
@@ -45,11 +46,12 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name="my_project", thre
     '''
 
     print("search......")
+    
     pool = Pool(threads)
     gRNA_gene = {}
-    '''
+    
     with open(lib) as fh:
-        result = pool.map(search_a,[line for line in fh])
+        result = pool.map(partial(search_a,number),[line for line in fh])
         gRNA_gene.update(result)
 
     fix_seq_len = len(fix_seq)
@@ -65,7 +67,7 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name="my_project", thre
 
     result = Pool(8).map(search_a, [a[i] for i in range(len(a)-1)])
     gRNA_gene.update(result)
-    
+    '''
     ## extract core function as a function, def core_func(param1,param2): XXX
     ## define thread pool, p = Pool(threads)
     ## map and reduce, p.map(core_func, [inputs])
@@ -91,22 +93,22 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name="my_project", thre
                 gene = gRNA_gene[k]
             f.write("%s\t%s\t%d\n"%(gene,k,v))
 
-'''
-def search_a(line, number=[25,45]):
+
+def search_a(number,line):
     cl = line.split(",")
     gene = cl[0]
     gRNA = cl[1][number[0]:number[1]]
     result = (gRNA, gene)
     return result
-'''
 
+'''
 def search_a(line):
     cl = line[0][0].split(",")
     gene = cl[0]
     gRNA = cl[1][line[1][0]:line[1][1]]
     result = (gRNA, gene)
     return result 
-
+'''
 
 def pcr_count(project_name):
     '''
