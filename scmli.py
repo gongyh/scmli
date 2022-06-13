@@ -4,7 +4,7 @@ import argparse
 import os
 from libs.pcr_pipeline import pcr_qc, pcr_parse_gRNA, pcr_count
 import pandas as pd
-
+import datetime
 
 def create_arg_parser():
 
@@ -72,11 +72,18 @@ if __name__ == "__main__":
     if args.model == "PCR":
         current_dir = os.getcwd()
         os.chdir(args.output_dir)
+        aa=datetime.datetime.now()
         pcr_qc(args.output_name, args.read1, args.read2, args.FASTQC_PATH, args.TRIM_GALORE_PATH, args.threads)
+        bb=datetime.datetime.now()
         pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name, args.threads)
+        cc=datetime.datetime.now()
         pcr_count(args.output_name)
+        dd=datetime.datetime.now()
         os.chdir(current_dir)
         print("Finished!")
+        print(bb-aa)
+        print(cc-bb)
+        print(dd-cc)
     elif args.model == "TEST":
         try:
             print(args)

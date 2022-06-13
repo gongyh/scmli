@@ -51,14 +51,16 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name="my_project", thre
     gRNA_gene = {}
     
     with open(lib) as fh:
-        result = pool.map(partial(search_a,number),[line for line in fh])
+        lines = fh.readlines()
+        result = pool.map(partial(search_a,number),lines)
         gRNA_gene.update(result)
 
     fix_seq_len = len(fix_seq)
     gRNAs_dict = {}
     
-    with open("../output/my_project.fq") as handle:
-        gRNA = Pool(6).map(partial(search_b,fix_seq,fix_seq_len,number),[record for record in SeqIO.parse(handle, "fastq")])
+    with open(project_name + ".fq") as handle:
+        records = list(SeqIO.parse(handle, "fastq"))
+        gRNA = pool.map(partial(search_b,fix_seq,fix_seq_len,number), records)
         for key in gRNA:
             gRNAs_dict[key] = gRNAs_dict.get(key, 0) + 1
         del gRNAs_dict[None]
