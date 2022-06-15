@@ -4,8 +4,10 @@ import os
 import sys
 import pandas as pd
 import numpy as np
+import datetime
 from Bio import SeqIO
 from Bio.Seq import Seq
+from Bio.SeqIO.QualityIO import FastqGeneralIterator
 from multiprocessing import Pool
 from functools import partial
 
@@ -59,16 +61,29 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name="my_project", thre
     gRNAs_dict = {}
     
     with open(project_name + ".fq") as handle:
-        records = list(SeqIO.parse(handle, "fastq"))
+        a1 = datetime.datetime.now()
+        # records = list(SeqIO.parse(handle, "fastq"))
+        records = list(seq for (title, seq, quality) in FastqGeneralIterator(handle))
+        a2 = datetime.datetime.now()
         gRNA = pool.map(partial(search_b,fix_seq,fix_seq_len,number), records)
+        a3 = datetime.datetime.now()
         for key in gRNA:
             gRNAs_dict[key] = gRNAs_dict.get(key, 0) + 1
         del gRNAs_dict[None]
+        a4 = datetime.datetime.now()
+        print("1")
+        print(a2-a1)
+        print("2")
+        print(a3-a2)
+        print("3")
+        print(a4-a3)
 
     '''
     with open(project_name + ".fq") as handle:
-        for record in SeqIO.parse(handle, "fastq"):
-            seq = str(record.seq)
+        # for record in SeqIO.parse(handle, "fastq"):
+        a1 = datetime.datetime.now()
+        for (title, seq, quality) in FastqGeneralIterator(handle):    
+            # seq = str(record.seq)
             if seq[0:fix_seq_len] == fix_seq: #valid record
                 #change left and right equal
                 gRNA = str(seq[fix_seq_len+number[0]:fix_seq_len+number[1]])
@@ -76,6 +91,9 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name="my_project", thre
                     gRNAs_dict[gRNA] += 1
                 else:
                     gRNAs_dict[gRNA] = 1
+        a2 = datetime.datetime.now()
+        print("1")
+        print(a2-a1)
     '''
 
     with open(project_name+".counts", "w") as f:
@@ -94,9 +112,9 @@ def search_a(number,line):
     return result
 
 def search_b(fix_seq, fix_seq_len, number, record):
-    seq = str(record.seq)
-    if seq[0:30] == fix_seq: ##valid record
-        gRNA = seq[fix_seq_len+number[0]:fix_seq_len+number[1]]
+    # seq = str(record.seq)
+    if record[0:30] == fix_seq: ##valid record
+        gRNA = record[fix_seq_len+number[0]:fix_seq_len+number[1]]
         return gRNA
 
 def pcr_count(project_name):
