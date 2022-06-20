@@ -30,7 +30,7 @@ jobs:
       run: |
         #conda info
         #conda list
-        conda install -n test pandas biopython fastqc trim-galore>=0.6.0 flake8 pytest
+        conda install -n test pandas biopython matplotlib fastqc trim-galore>=0.6.0 flake8 pytest
     - name: Check out repository code
       uses: actions/checkout@v3
     - name: Lint with flake8
