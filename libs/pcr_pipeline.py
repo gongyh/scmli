@@ -114,7 +114,7 @@ def pcr_count(project_name):
     x = ['All_gRNA','Gene_gRNA','Unknow_gRNA','Nano']
     y = [stats['all_kinds'],stats['no_kinds'],stats['un_kinds'],stats['lib_kinds']]
     plt.style.use('seaborn')
-    fig, ax = plt.subplots(figsize=(6.5, 4), facecolor='white', dpi=100)
+    fig, ax = plt.subplots(figsize=(7, 4), facecolor='white', dpi=100)
     plt.bar(x,y,width=0.4)
     plt.ylabel('Number of gRNAs', fontsize=14)
     plt.xticks(fontsize=12)
@@ -129,7 +129,7 @@ def pcr_count(project_name):
     x = ['All_counts','Gene_counts','Unknow_counts']
     y = [stats['all_counts'],stats['no_counts'],stats['un_counts']]
     plt.style.use('seaborn')
-    fig, ax = plt.subplots(figsize=(6.5, 4), facecolor='white', dpi=100)
+    fig, ax = plt.subplots(figsize=(7.5, 4), facecolor='white', dpi=100)
     plt.bar(x,y,width=0.4)
     plt.ylabel('Number of gRNAs', fontsize=14)
     plt.xticks(fontsize=12)
@@ -144,8 +144,8 @@ def pcr_count(project_name):
     x = range(len(no_counts))
     y = no_counts
     plt.style.use('seaborn')
-    fig, ax = plt.subplots(figsize=(6.5, 4), facecolor='white', dpi=100)
-    plt.plot(x,y)
+    fig, ax = plt.subplots(figsize=(7, 4), facecolor='white', dpi=100)
+    plt.scatter(x,y,s=1)
     plt.ylabel('Frequency', fontsize=14)
     plt.xticks(fontsize=12)
     plt.show()
