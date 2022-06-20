@@ -5,7 +5,7 @@ import sys
 import pandas as pd
 import numpy as np
 from Bio.SeqIO.QualityIO import FastqGeneralIterator
-
+import matplotlib.pyplot as plt
 
 def pcr_qc(project_name, read1, read2, FASTQC_PATH=None, TRIM_GALORE_PATH=None, threads=8):
 
@@ -98,11 +98,45 @@ def pcr_count(project_name):
 
     stats = {}
     stats["all_kinds"] = len(df1)
-    #stats["lib_kinds"] = 9710
-    #stats["un_kinds"] = len(df1[df1["gene_id"]=="unknow"])
-    #stats["no_kinds"] = len(df1[df1["gene_id"]!="unknow"])
-    #stats["no_sum"] = np.sum(df1[df1["gene_id"]!="unknow"]["counts"])
-    #stats["no_average"] = np.average(df1[df1["gene_id"]!="unknow"]["counts"])
-    #stats["no_coverage"] = stats["no_kinds"]/9710
+    stats["lib_kinds"] = 9709
+    stats["un_kinds"] = len(df1[df1["gene_id"]=="unknow"])
+    stats["no_kinds"] = len(df1[df1["gene_id"]!="unknow"])
+    stats['all_counts'] = np.sum(df1['counts'])
+    stats['un_counts'] = np.sum(df1[df1['gene_id']=='unknow']['counts'])
+    stats['no_counts'] = np.sum(df1[df1['gene_id']!='unknow']['counts'])
+    stats["no_average"] = np.average(df1[df1["gene_id"]!="unknow"]["counts"])
+    stats["no_coverage"] = stats["no_kinds"]/9710
     
+
+    #plot1 four kinds
+    x = ['All_gRNA','Gene_gRNA','Unknow_gRNA','Nano']
+    y = [stats['all_kinds'],stats['no_kinds'],stats['un_kinds'],stats['lib_kinds']]
+    plt.style.use('seaborn')
+    fig, ax = plt.subplots(figsize=(6.5, 4), facecolor='white', dpi=100)
+    plt.bar(x,y,width=0.4)
+    plt.ylabel('Gene Number', fontsize=14)
+    plt.xticks(fontsize=12)
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    for a,b in zip(x,y):
+        plt.text(a, b, b, ha='center', va='bottom', fontsize=14)
+    plt.show()
+    fig.savefig('allkinds.png')
+
+    #plot2 four counts
+    x = ['All_counts','Gene_counts','Unknow_counts']
+    y = [stats['all_counts'],stats['no_counts'],stats['un_counts']]
+    plt.style.use('seaborn')
+    fig, ax = plt.subplots(figsize=(6.5, 4), facecolor='white', dpi=100)
+    plt.bar(x,y,width=0.4)
+    plt.ylabel('Gene Number', fontsize=14)
+    plt.xticks(fontsize=12)
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    for a,b in zip(x,y):
+        plt.text(a, b, b, ha='center', va='bottom', fontsize=14)
+    plt.show()
+    fig.savefig('allcounts.png')
+
+
     return stats
