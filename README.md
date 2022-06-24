@@ -27,7 +27,7 @@ Python3 (3.9)<br />
 Biopython (1.79) (python package)<br />
 pandas (1.4.2) (python package)<br />
 argparse (python package, only needed if python<=3.6)<br />
-matplotlib (3.5.1)<br />
+rpy2 (3.4.5)<br />
 fastqc (0.11.9)<br />
 trim-galore>=0.6.0 (0.6.7)<br />
 
@@ -36,7 +36,7 @@ The tested versions are given in parentheses.
 
 You can install these dependencies using Conda ([Miniconda3](https://docs.conda.io/en/latest/miniconda.html)):
 ```
-conda install -c bioconda pandas biopython matplotlib fastqc trim-galore>=0.6.0
+conda install -c bioconda pandas biopython rpy2 fastqc trim-galore>=0.6.0
 ```
 
 ## Usage
