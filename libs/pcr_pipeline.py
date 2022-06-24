@@ -5,7 +5,11 @@ import sys
 import pandas as pd
 import numpy as np
 from Bio.SeqIO.QualityIO import FastqGeneralIterator
-import matplotlib.pyplot as plt
+import rpy2
+import rpy2.robjects as robjects
+import rpy2.robjects.lib.ggplot2 as ggplot2
+from rpy2.robjects import pandas2ri
+from rpy2.robjects import globalenv
 
 def pcr_qc(project_name, read1, read2, FASTQC_PATH=None, TRIM_GALORE_PATH=None, threads=8):
 
@@ -56,12 +60,14 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name='my_project', thre
 
     fix_seq_len = len(fix_seq)
     gRNAs_dict = {}
-    
+    stats = {}
+    read_counts = 0
     # Get fixed sequence from file.fastq and count
     # {'GAGTGTGGTGGAATTTGCCG': 3, ...}
 
     with open(project_name + '.fq') as handle:
         for (title, seq, quality) in FastqGeneralIterator(handle):    
+            read_counts += 1
             if seq[0:fix_seq_len] == fix_seq: #valid record
                 #change left and right equal
                 gRNA = seq[fix_seq_len+number[0]:fix_seq_len+number[1]]
@@ -69,7 +75,20 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name='my_project', thre
                     gRNAs_dict[gRNA] += 1
                 else:
                     gRNAs_dict[gRNA] = 1
+    stats['all_reads'] = read_counts
 
+    '''
+    #multi processing
+    # from multiprocessing import Pool
+    # from functools import partial
+    pool = Pool(threads)
+    with open(project_name + '.fq') as handle:
+        records = list(seq for (title, seq, quality) in FastqGeneralIterator(handle))
+    gRNA = pool.map(partial(search,fix_seq,fix_seq_len,number), records)
+    for key in gRNA:
+        gRNAs_dict[key] = gRNAs_dict.get(key, 0) + 1
+    del gRNAs_dict[None]
+    '''
 
     # Change count format and add gRNA_gene id
     # NO01G00240  GAGTGTGGTGGAATTTGCCG  3
@@ -82,8 +101,16 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name='my_project', thre
                 gene = gRNA_gene[k]
             f.write("%s\t%s\t%d\n"%(gene,k,v))
 
+    return stats
 
-def pcr_count(project_name):
+'''
+def search(fix_seq, fix_seq_len, number, record):
+    if record[0:30] == fix_seq: ##valid record
+        gRNA = record[fix_seq_len+number[0]:fix_seq_len+number[1]]
+        return gRNA
+'''
+
+def pcr_count(project_name, stats):
 
     # Statistics
 
@@ -96,59 +123,48 @@ def pcr_count(project_name):
     df1 = df1.sort_values(by='counts', ascending = False)
     df1.to_csv(project_name + '.percent', sep = '\t', index = False)
 
-    stats = {}
+    stats['valid_reads'] = np.sum(df1['counts'])
+    stats['unknow_reads'] = np.sum(df1[df1['gene_id']=='unknow']['counts'])
+    df_gene = df1[df1['gene_id']!='unknow']
+    stats['gene_reads'] = np.sum(df_gene['counts'])
     stats['all_kinds'] = len(df1)
     stats['lib_kinds'] = 9709
-    stats['un_kinds'] = len(df1[df1['gene_id']=='unknow'])
-    stats['no_kinds'] = len(df1[df1['gene_id']!='unknow'])
-    stats['all_counts'] = np.sum(df1['counts'])
-    stats['un_counts'] = np.sum(df1[df1['gene_id']=='unknow']['counts'])
-    no_counts = df1[df1['gene_id']!='unknow']['counts']
-    stats['no_counts'] = np.sum(no_counts)
-    stats['no_average'] = np.average(df1[df1['gene_id']!='unknow']['counts'])
-    stats['no_coverage'] = stats['no_kinds']/9710
+    stats['unknow_kinds'] = len(df1[df1['gene_id']=='unknow'])
+    stats['gene_kinds'] = len(df1[df1['gene_id']!='unknow'])
+    stats['valid/all_reads_percent'] = stats['valid_reads'] / stats['all_reads']
+    stats['gene/valid_reads_percent'] = stats['gene_reads'] / stats['valid_reads']
+    stats['gene_coverage'] = stats['gene_kinds']/9709
+    stats['gene_average'] = np.average(df_gene['counts'])
+
     with open(project_name+'.stats','w') as filestats:
-        filestats.write(str(stats))
+        for a,b in stats.items():
+            filestats.write('%s\t%s\n'%(a,b))
 
-    #plot1 four kinds
-    x = ['All_gRNA','Gene_gRNA','Unknow_gRNA','Nano']
-    y = [stats['all_kinds'],stats['no_kinds'],stats['un_kinds'],stats['lib_kinds']]
-    plt.style.use('seaborn')
-    fig, ax = plt.subplots(figsize=(7, 4), facecolor='white', dpi=100)
-    plt.bar(x,y,width=0.4)
-    plt.ylabel('Number of gRNAs', fontsize=14)
-    plt.xticks(fontsize=12)
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    for a,b in zip(x,y):
-        plt.text(a, b, b, ha='center', va='bottom', fontsize=14)
-    plt.show()
-    fig.savefig('allkinds.png')
+    #prepare dataframe
+    pandas2ri.activate()
 
-    #plot2 four counts
-    x = ['All_counts','Gene_counts','Unknow_counts']
-    y = [stats['all_counts'],stats['no_counts'],stats['un_counts']]
-    plt.style.use('seaborn')
-    fig, ax = plt.subplots(figsize=(7.5, 4), facecolor='white', dpi=100)
-    plt.bar(x,y,width=0.4)
-    plt.ylabel('Number of gRNAs', fontsize=14)
-    plt.xticks(fontsize=12)
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    for a,b in zip(x,y):
-        plt.text(a, b, b, ha='center', va='bottom', fontsize=14)
-    plt.show()
-    fig.savefig('allcounts.png')
+    df_reads = pd.DataFrame({'Name': ['All reads', 'Valid reads', 'Gene reads', 'Unknow reads'], 'Number': [stats['all_reads'], stats['valid_reads'], stats['gene_reads'], stats['unknow_reads']]})
+    globalenv['df_reads'] = df_reads
+    globalenv['df_gene'] = df_gene
 
-    #plot3 frequency
-    x = range(len(no_counts))
-    y = no_counts
-    plt.style.use('seaborn')
-    fig, ax = plt.subplots(figsize=(7, 4), facecolor='white', dpi=100)
-    plt.scatter(x,y,s=1)
-    plt.ylabel('Frequency', fontsize=14)
-    plt.xticks(fontsize=12)
-    plt.show()
-    fig.savefig('Frequency.png')
+    reads_rscript="""
+    df_reads$Name <- factor(df_reads$Name, levels = c('All reads', 'Valid reads', 'Gene reads', 'Unknow reads'))
+    pp = ggplot(df_reads,aes(Name, Number)) + geom_col(color = 'blue', fill='white') +
+        geom_text(aes(label=Number),vjust = -0.2)
+    ggsave("reads.png",pp)
+    """
+    frequency_rscript="""
+    pp = ggplot(df_gene,aes(x=reorder(gene_id,counts),y=counts)) + geom_point(size=0.5) +
+        theme_grey() + xlab('Gene') + ylab('Frequency') + 
+        theme(axis.text.x = element_blank())
+    ggsave("frequency.png",pp)
+    """
+    qqplot_rscript="""
+    pp = ggplot(df_gene,aes(sample=counts)) + geom_qq() + geom_qq_line()
+    ggsave("qqplot.png",pp)
+    """
+    robjects.r(reads_rscript)
+    robjects.r(frequency_rscript)
+    robjects.r(qqplot_rscript)
 
     return stats
