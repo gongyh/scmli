@@ -170,6 +170,6 @@ def pcr_count(project_name, stats):
     robjects.r(reads_rscript)
     robjects.r(frequency_rscript)
     robjects.r(qqplot_rscript)
-    robjects.r(qqplot_histogram)
+    robjects.r(histogram_rscript)
 
     return stats
