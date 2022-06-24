@@ -149,7 +149,7 @@ def pcr_count(project_name, stats):
 
     reads_rscript="""
     df_reads$Name <- factor(df_reads$Name, levels = c('All reads', 'Valid reads', 'Gene reads', 'Unknow reads'))
-    pp = ggplot(df_reads,aes(Name, Number)) + geom_col(color = 'blue', fill='white') +
+    pp = ggplot(df_reads,aes(Name, Number)) + geom_col(color = 'lightblue', fill='white') +
         geom_text(aes(label=Number),vjust = -0.2)
     ggsave("reads.png",pp)
     """
@@ -163,8 +163,13 @@ def pcr_count(project_name, stats):
     pp = ggplot(df_gene,aes(sample=counts)) + geom_qq() + geom_qq_line()
     ggsave("qqplot.png",pp)
     """
+    histogram_rscript="""
+    pp = ggplot(df_gene,aes(x=counts))+geom_histogram(binwidth=10,fill='lightblue',color='black')
+    ggsave("histogram.png",pp)
+    """
     robjects.r(reads_rscript)
     robjects.r(frequency_rscript)
     robjects.r(qqplot_rscript)
+    robjects.r(qqplot_histogram)
 
     return stats
