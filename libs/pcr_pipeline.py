@@ -5,11 +5,6 @@ import sys
 import pandas as pd
 import numpy as np
 from Bio.SeqIO.QualityIO import FastqGeneralIterator
-import rpy2
-import rpy2.robjects as robjects
-import rpy2.robjects.lib.ggplot2 as ggplot2
-from rpy2.robjects import pandas2ri
-from rpy2.robjects import globalenv
 
 def pcr_qc(project_name, read1, read2, FASTQC_PATH=None, TRIM_GALORE_PATH=None, threads=8):
 
@@ -75,7 +70,7 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name='my_project', thre
                     gRNAs_dict[gRNA] += 1
                 else:
                     gRNAs_dict[gRNA] = 1
-    stats['all_reads'] = read_counts
+    stats['all_reads'] = read_counts/2 #paired
 
     '''
     #multi processing
@@ -117,59 +112,29 @@ def pcr_count(project_name, stats):
     #fixed_seq, e.g. GGTAGAATTGGTCGTTGCCATCGACCAGGC
     print("stats......")
     df1 = pd.read_csv(project_name + '.counts', sep = '\t', header = None, names = ["gene_id", "sequence", "counts", "percent"])
-    t = df1['counts'].sum()
-    df1['percent'] = df1['counts']/t
-    df1['percent'] = df1['percent'].round(7)    
+    t = df1.counts.sum()
+    df1.percent = (df1.counts/t)*100
+    df1.loc[:,'percent'] = df1.loc[:,'percent'].round(7)    
     df1 = df1.sort_values(by='counts', ascending = False)
     df1.to_csv(project_name + '.percent', sep = '\t', index = False)
 
-    stats['valid_reads'] = np.sum(df1['counts'])
-    stats['unknow_reads'] = np.sum(df1[df1['gene_id']=='unknow']['counts'])
-    df_gene = df1[df1['gene_id']!='unknow']
-    stats['gene_reads'] = np.sum(df_gene['counts'])
+    stats['valid_reads'] = np.sum(df1.counts)
+    stats['unknow_reads'] = np.sum(df1.loc[df1.gene_id=='unknow','counts'])
+    df_gene = df1[df1.gene_id!='unknow'].copy()
+    stats['gene_reads'] = np.sum(df_gene.counts)
     stats['all_kinds'] = len(df1)
     stats['lib_kinds'] = 9709
-    stats['unknow_kinds'] = len(df1[df1['gene_id']=='unknow'])
-    stats['gene_kinds'] = len(df1[df1['gene_id']!='unknow'])
+    stats['unknow_kinds'] = len(df1[df1.gene_id=='unknow'])
+    stats['gene_kinds'] = len(df1[df1.gene_id!='unknow'])
     stats['valid/all_reads_percent'] = stats['valid_reads'] / stats['all_reads']
     stats['gene/valid_reads_percent'] = stats['gene_reads'] / stats['valid_reads']
     stats['gene_coverage'] = stats['gene_kinds']/9709
-    stats['gene_average'] = np.average(df_gene['counts'])
+    stats['gene_average'] = np.average(df_gene.counts)
 
     with open(project_name+'.stats','w') as filestats:
         for a,b in stats.items():
             filestats.write('%s\t%s\n'%(a,b))
 
-    #prepare dataframe
-    pandas2ri.activate()
-
-    df_reads = pd.DataFrame({'Name': ['All reads', 'Valid reads', 'Gene reads', 'Unknow reads'], 'Number': [stats['all_reads'], stats['valid_reads'], stats['gene_reads'], stats['unknow_reads']]})
-    globalenv['df_reads'] = df_reads
-    globalenv['df_gene'] = df_gene
-
-    reads_rscript="""
-    df_reads$Name <- factor(df_reads$Name, levels = c('All reads', 'Valid reads', 'Gene reads', 'Unknow reads'))
-    pp = ggplot(df_reads,aes(Name, Number)) + geom_col(color = 'lightblue', fill='white') +
-        geom_text(aes(label=Number),vjust = -0.2)
-    ggsave("reads.png",pp)
-    """
-    frequency_rscript="""
-    pp = ggplot(df_gene,aes(x=reorder(gene_id,counts),y=counts)) + geom_point(size=0.5) +
-        theme_grey() + xlab('Gene') + ylab('Frequency') + 
-        theme(axis.text.x = element_blank())
-    ggsave("frequency.png",pp)
-    """
-    qqplot_rscript="""
-    pp = ggplot(df_gene,aes(sample=counts)) + geom_qq() + geom_qq_line()
-    ggsave("qqplot.png",pp)
-    """
-    histogram_rscript="""
-    pp = ggplot(df_gene,aes(x=counts))+geom_histogram(binwidth=10,fill='lightblue',color='black')
-    ggsave("histogram.png",pp)
-    """
-    robjects.r(reads_rscript)
-    robjects.r(frequency_rscript)
-    robjects.r(qqplot_rscript)
-    robjects.r(histogram_rscript)
-
     return stats
+
+
