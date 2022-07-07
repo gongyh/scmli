@@ -44,6 +44,15 @@ frequency <- ggplot(df_gRNAs,aes(x=reorder(gene_id,gRNAs_percent),y=gRNAs_percen
   theme(axis.text.x = element_blank(),
         axis.title.x=element_text(size=16),
         axis.title.y=element_text(size=16))
+#add text
+x_range <- layer_scales(frequency)$x$range$range
+y_range <- layer_scales(frequency)$y$range$range
+Mean<-mean(df_gRNAs$gRNAs_percent)
+Var<-var(df_gRNAs$gRNAs_percent)
+CV<-sqrt(Var)/Mean
+frequency<-frequency + geom_text(x=x_range[length(x_range)*0.8],
+    y=y_range[2]*0.92,
+    aes(label=paste0('Var = ',Var,'\nCV = ',CV)))
 ggsave('frequency.png',frequency)
 
 #plot3 histogram

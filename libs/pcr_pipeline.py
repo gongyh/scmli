@@ -55,6 +55,8 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name='my_project', thre
 
     fix_seq_len = len(fix_seq)
     gRNAs_dict = {}
+    for i in gRNA_gene.keys():
+        gRNAs_dict[i]=0
     stats = {}
     read_counts = 0
     # Get fixed sequence from file.fastq and count
@@ -120,16 +122,16 @@ def pcr_count(project_name, stats):
 
     stats['valid_reads'] = np.sum(df1.counts)
     stats['unknow_reads'] = np.sum(df1.loc[df1.gene_id=='unknow','counts'])
-    df_gene = df1[df1.gene_id!='unknow'].copy()
-    stats['gene_reads'] = np.sum(df_gene.counts)
+    df_gRNAs = df1[(df1.gene_id!='unknow') & (df1.counts!=0)].copy()
+    stats['gRNAs_reads'] = np.sum(df_gRNAs.counts)
     stats['all_kinds'] = len(df1)
     stats['lib_kinds'] = 9709
     stats['unknow_kinds'] = len(df1[df1.gene_id=='unknow'])
-    stats['gene_kinds'] = len(df1[df1.gene_id!='unknow'])
+    stats['gRNAs_kinds'] = len(df_gRNAs)
     stats['valid/all_reads_percent'] = stats['valid_reads'] / stats['all_reads']
-    stats['gene/valid_reads_percent'] = stats['gene_reads'] / stats['valid_reads']
-    stats['gene_coverage'] = stats['gene_kinds']/9709
-    stats['gene_average'] = np.average(df_gene.counts)
+    stats['gRNAs/valid_reads_percent'] = stats['gRNAs_reads'] / stats['valid_reads']
+    stats['gRNAs_coverage'] = stats['gRNAs_kinds']/9709
+    stats['gRNAs_average'] = np.average(df1.loc[df1.gene_id!='unknow','counts'])
 
     with open(project_name+'.stats','w') as filestats:
         for a,b in stats.items():

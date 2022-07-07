@@ -37,5 +37,6 @@ def test_pcr():
     stats = pcr_count(args.output_name, stats)
     os.system('Rscript '+scmli_dir+'/libs/plot.r '+args.output_name)
     assert os.path.isfile(args.output_name + ".percent") == True
-    assert stats["all_kinds"] == 12308
+    assert os.path.isfile("frequency.png") == True
+    assert stats["all_kinds"] == 12649
     os.chdir(current_dir)
