@@ -26,9 +26,9 @@ def pcr_qc(project_name, read1, read2, FASTQC_PATH=None, TRIM_GALORE_PATH=None, 
 
     # Unzip and merge files
     name1 = read1.split('/')[-1]
-    name1 = name1.split('.fq.gz')[0] + '_val_1.fq.gz'
+    name1 = name1.split('.')[0] + '_val_1.fq.gz'
     name2 = read2.split('/')[-1]
-    name2 = name2.split('.fq.gz')[0] + '_val_2.fq.gz'
+    name2 = name2.split('.')[0] + '_val_2.fq.gz'
     os.system('gzip -cd ' + name1 + ' ' + name2 + ' > ' + project_name + '.fq')
 
 

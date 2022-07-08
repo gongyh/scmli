@@ -70,9 +70,9 @@ if __name__ == "__main__":
         print("parser error")
         os._exit(0)
     if args.model == "PCR":
-        current_dir = os.getcwd()
-        scmli_dir = os.path.split(os.path.realpath(__file__))[0]
-        os.chdir(args.output_dir)
+        current_dir = os.getcwd() # curring working directory
+        scmli_dir = os.path.split(os.path.realpath(__file__))[0] # scmli root directory
+        os.chdir(args.output_dir) # change to output directory
         pcr_qc(args.output_name, args.read1, args.read2, args.FASTQC_PATH, args.TRIM_GALORE_PATH, args.threads)
         stats = pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name, args.threads)
         stats = pcr_count(args.output_name, stats)
