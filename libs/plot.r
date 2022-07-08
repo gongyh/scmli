@@ -29,7 +29,7 @@ reads = ggplot(df_reads,aes(Key, Counts)) +
   theme(axis.text.x = element_text(size=16),
         axis.title.y= element_text(size=16),
         axis.text.y = element_text(size=12))
-ggsave('reads.png',reads)
+ggsave('reads.pdf',reads)
 
 #plot2 frequency
 frequency <- ggplot(df_gRNAs,aes(x=reorder(gene_id,gRNAs_percent),y=gRNAs_percent)) + 
@@ -53,7 +53,7 @@ CV<-sqrt(Var)/Mean
 frequency<-frequency + geom_text(x=x_range[length(x_range)*0.8],
     y=y_range[2]*0.92,
     aes(label=paste0('Var = ',Var,'\nCV = ',CV)))
-ggsave('frequency.png',frequency)
+ggsave('frequency.pdf',frequency)
 
 #plot3 histogram
 histogram<-ggplot(df_gRNAs,aes(x=gRNAs_percent))+geom_histogram(bins=30,fill='lightblue',color='black') +
@@ -63,7 +63,7 @@ histogram<-ggplot(df_gRNAs,aes(x=gRNAs_percent))+geom_histogram(bins=30,fill='li
   theme(axis.text.x = element_text(size=12),
         axis.title.x= element_text(size=16),
         axis.title.y= element_text(size=16))
-ggsave('histogram.png',histogram)
+ggsave('histogram.pdf',histogram)
 
 
 

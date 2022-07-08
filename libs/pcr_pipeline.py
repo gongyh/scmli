@@ -26,9 +26,9 @@ def pcr_qc(project_name, read1, read2, FASTQC_PATH=None, TRIM_GALORE_PATH=None, 
 
     # Unzip and merge files
     name1 = read1.split('/')[-1]
-    name1 = name1.split('.')[0] + '_val_1.fq.gz'
+    name1 = name1.split('.f')[0] + '_val_1.fq.gz'
     name2 = read2.split('/')[-1]
-    name2 = name2.split('.')[0] + '_val_2.fq.gz'
+    name2 = name2.split('.f')[0] + '_val_2.fq.gz'
     os.system('gzip -cd ' + name1 + ' ' + name2 + ' > ' + project_name + '.fq')
 
 
@@ -72,7 +72,7 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name='my_project', thre
                     gRNAs_dict[gRNA] += 1
                 else:
                     gRNAs_dict[gRNA] = 1
-    stats['all_reads'] = read_counts/2 #paired
+    stats['all_reads'] = int(read_counts/2) #paired
 
     '''
     #multi processing
@@ -128,11 +128,11 @@ def pcr_count(project_name, stats):
     stats['lib_kinds'] = 9709
     stats['unknow_kinds'] = len(df1[df1.gene_id=='unknow'])
     stats['gRNAs_kinds'] = len(df_gRNAs)
-    stats['valid/all_reads_percent'] = stats['valid_reads'] / stats['all_reads']
-    stats['gRNAs/valid_reads_percent'] = stats['gRNAs_reads'] / stats['valid_reads']
-    stats['gRNAs_coverage'] = stats['gRNAs_kinds']/9709
-    stats['gRNAs_average'] = np.average(df1.loc[df1.gene_id!='unknow','counts'])
-
+    stats['valid/all_reads_percent'] = round(stats['valid_reads'] / stats['all_reads'],6)
+    stats['gRNAs/valid_reads_percent'] = round(stats['gRNAs_reads'] / stats['valid_reads'],6)
+    stats['gRNAs_coverage'] = round(stats['gRNAs_kinds']/9709,6)
+    stats['gRNAs_average_all'] = round(np.average(df1.loc[df1.gene_id!='unknow','counts']),6)
+    stats['gRNAs_average_present'] = round(np.average(df_gRNAs.counts),6)
     with open(project_name+'.stats','w') as filestats:
         for a,b in stats.items():
             filestats.write('%s\t%s\n'%(a,b))
