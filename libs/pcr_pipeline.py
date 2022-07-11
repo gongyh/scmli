@@ -57,21 +57,28 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name='my_project', thre
     gRNAs_dict = {}
     for i in gRNA_gene.keys():
         gRNAs_dict[i]=0
+    gRNAs_dict_original = gRNAs_dict.copy()
     stats = {}
     read_counts = 0
     # Get fixed sequence from file.fastq and count
     # {'GAGTGTGGTGGAATTTGCCG': 3, ...}
 
     with open(project_name + '.fq') as handle:
+        file_unknow = open('unknow.seq','w')
         for (title, seq, quality) in FastqGeneralIterator(handle):    
             read_counts += 1
             if seq[0:fix_seq_len] == fix_seq: #valid record
                 #change left and right equal
                 gRNA = seq[fix_seq_len+number[0]:fix_seq_len+number[1]]
-                if gRNA in gRNAs_dict.keys():
+                if gRNA in gRNAs_dict_original.keys(): #gRNAs
                     gRNAs_dict[gRNA] += 1
+                elif gRNA in gRNAs_dict.keys():
+                    gRNAs_dict[gRNA] += 1
+                    file_unknow.write(seq+'\n')
                 else:
                     gRNAs_dict[gRNA] = 1
+                    file_unknow.write(seq+'\n')
+        file_unknow.close()
     stats['all_reads'] = int(read_counts/2) #paired
 
     '''
