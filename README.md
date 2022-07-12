@@ -94,6 +94,7 @@ python3 scmli.py -m PCR \
 | NO01G05060 | GTTGCCTCTTACCCCACCCA | 15      | 0.0003327 |
 | NO14G00420 | TTGATTCGAAGAATGAGTGT | 15      | 0.0003327 |
 | .......    | .......              | ....... | ......    |
+<br />
 {OUTPUT_NAME}.stats <br />
 {OUTPUT_NAME}.log <br />
 reads/frequency/histogram.pdf
