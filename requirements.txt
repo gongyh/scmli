@@ -1,3 +1,2 @@
 Biopython
 pandas
-rpy2
