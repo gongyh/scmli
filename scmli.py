@@ -37,6 +37,7 @@ def check_args(parser):
     args.read1 = os.path.abspath(args.read1)
     args.read2 = os.path.abspath(args.read2)
     args.lib = os.path.abspath(args.lib)
+    args.seq = args.seq.upper()
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
     args.output_dir = os.path.abspath(args.output_dir)
