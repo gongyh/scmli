@@ -32,8 +32,8 @@ def test_pcr():
     current_dir = os.getcwd()
     scmli_dir = os.path.split(os.path.realpath(__file__))[0]
     os.chdir(args.output_dir)
-    pcr_qc(args.output_name, args.read1, args.read2, args.FASTQC_PATH, args.TRIM_GALORE_PATH, args.threads)
-    stats = pcr_parse_gRNA(args.lib, args.seq, args.number, args.output_name, args.threads)
+    stats = pcr_qc(args.output_name, args.read1, args.read2, args.FASTQC_PATH, args.TRIM_GALORE_PATH, args.threads)
+    stats = pcr_parse_gRNA(stats, args.lib, args.seq, args.number, args.output_name, args.threads)
     stats = pcr_count(args.output_name, stats)
     os.system('Rscript '+scmli_dir+'/../libs/plot.r '+args.output_name)
     assert os.path.isfile(args.output_name + ".percent") == True

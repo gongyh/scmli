@@ -5,6 +5,7 @@ import sys
 import pandas as pd
 import numpy as np
 from Bio.SeqIO.QualityIO import FastqGeneralIterator
+from lxml import etree
 
 def pcr_qc(project_name, read1, read2, FASTQC_PATH=None, TRIM_GALORE_PATH=None, threads=8):
 
@@ -25,14 +26,26 @@ def pcr_qc(project_name, read1, read2, FASTQC_PATH=None, TRIM_GALORE_PATH=None, 
     os.system(TRIM_GALORE_BIN + ' --paired --fastqc --max_n 0 -j ' + str(threads) + ' --gzip ' + read1 + ' ' + read2 + '>> pcr_pipeline.log 2>&1')
 
     # Unzip and merge files
-    name1 = read1.split('/')[-1]
-    name1 = name1.split('.f')[0] + '_val_1.fq.gz'
-    name2 = read2.split('/')[-1]
-    name2 = name2.split('.f')[0] + '_val_2.fq.gz'
-    os.system('gzip -cd ' + name1 + ' ' + name2 + ' > ' + project_name + '.fq')
+    name11 = read1.split('/')[-1]
+    name11 = name11.split('.f')[0]
+    name12 = name11 + '_val_1.fq.gz'
+    name21 = read2.split('/')[-1]
+    name21 = name21.split('.f')[0]
+    name22 = name21 + '_val_2.fq.gz'
+    os.system('gzip -cd ' + name12 + ' ' + name22 + ' > ' + project_name + '.fq')
 
+    #stats raw_reads
+    stats = {}
+    html1 = etree.parse(name11+'_fastqc.html',etree.HTMLParser())
+    html2 = etree.parse(name21+'_fastqc.html',etree.HTMLParser())
+    raw_reads1 = html1.xpath('/html/body/div[3]/div[1]/table/tbody/tr[4]/td[2]')[0].text
+    raw_reads2 = html2.xpath('/html/body/div[3]/div[1]/table/tbody/tr[4]/td[2]')[0].text
 
-def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name='my_project', threads=8):
+    stats['raw_reads'] = int((int(raw_reads1)+int(raw_reads2))/2)
+
+    return stats
+
+def pcr_parse_gRNA(stats, lib, fix_seq, number=[25,45], project_name='my_project', threads=8):
     
     '''
     parse and count target sequence
@@ -58,7 +71,6 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name='my_project', thre
     for i in gRNA_gene.keys():
         gRNAs_dict[i]=0
     gRNAs_dict_original = gRNAs_dict.copy()
-    stats = {}
     read_counts = 0
     # Get fixed sequence from file.fastq and count
     # {'GAGTGTGGTGGAATTTGCCG': 3, ...}
@@ -79,6 +91,8 @@ def pcr_parse_gRNA(lib, fix_seq, number=[25,45], project_name='my_project', thre
                     gRNAs_dict[gRNA] = 1
                     file_unknow.write(seq+'\n')
         file_unknow.close()
+
+    #stats all_reads
     stats['all_reads'] = int(read_counts/2) #paired
 
     '''
@@ -135,6 +149,7 @@ def pcr_count(project_name, stats):
     stats['lib_kinds'] = 9709
     stats['unknow_kinds'] = len(df1[df1.gene_id=='unknow'])
     stats['gRNAs_kinds'] = len(df_gRNAs)
+    stats['all/raw_reads_percent'] = round(stats['all_reads'] / stats['raw_reads'],6)
     stats['valid/all_reads_percent'] = round(stats['valid_reads'] / stats['all_reads'],6)
     stats['gRNAs/valid_reads_percent'] = round(stats['gRNAs_reads'] / stats['valid_reads'],6)
     stats['gRNAs_coverage'] = round(stats['gRNAs_kinds']/9709,6)

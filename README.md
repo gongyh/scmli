@@ -26,6 +26,7 @@ git clone https://github.com/gongyh/scmli.git
 Python3 (3.9)<br />
 Biopython (1.79) (python package)<br />
 pandas (1.4.2) (python package)<br />
+lxml (4.9.1) (python package)
 argparse (python package, only needed if python<=3.6)<br />
 fastqc (0.11.9)<br />
 trim-galore>=0.6.0 (0.6.7)<br />
@@ -55,7 +56,7 @@ usage: scmli.py [-h] [-m {PCR,TEST}] -l LIB -s SEQ -r1 READ1 -r2 READ2 [-num NUM
 required arguments:
   -m {PCR,TEST}, --model {PCR,TEST}          Choose analysis model
   -l LIB, --lib LIB                          Gene library file
-  -s SEQ, --seq SEQ                          All sequences before gRNAs
+  -s SEQ, --seq SEQ                          Start with the first base, all sequences before gRNAs
   -r1 READ1, --read1 READ1                   Read1 file
   -r2 READ2, --read2 READ2                   Read2 file
 
@@ -82,21 +83,39 @@ python3 scmli.py -m PCR \
 
 ## Results
 
-{OUTPUT_NAME}.fastqc.html: fastqc results  <br />
-{OUTPUT_NAME}.counts:      count file <br />
-{OUTPUT_NAME}.percent:     show the counts and percent of target sequences <br />
+my_project.fastqc.html: fastqc results  <br />
+my_project.counts:      count file <br />
+my_project.percent:     the counts and percentage of target sequences <br />
+
 | gene_id    | sequence             | counts  | percent   |
 | ---------- | -------------------- | ------- | --------- |
 | NO12G02480 | TCTATCTCAACAGCCACCCG | 17      | 0.0003771 |
 | NO03G04750 | ACTTCCTGGTCCTCCCACGA | 17      | 0.0003771 |
 | NO08G01490 | TGCCTCAGGAGGGATGATCG | 16      | 0.0003549 |
 | NO02G03790 | GAGAACTTTTCATCCTCGCG | 16      | 0.0003549 |
-| NO01G05060 | GTTGCCTCTTACCCCACCCA | 15      | 0.0003327 |
-| NO14G00420 | TTGATTCGAAGAATGAGTGT | 15      | 0.0003327 |
 | .......    | .......              | ....... | ......    |
-<br />
-{OUTPUT_NAME}.stats <br />
-{OUTPUT_NAME}.log <br />
+
+my_project.stats <br />
+
+| header1                       | header2  |
+| -------                       | -------  |  
+|raw_reads                      | 50000    |
+|all_reads(clean reads)         | 49947    |
+|valid_reads                    | 45085    |
+|unknow_reads                   | 3393     | 
+|gRNAs_reads                    | 41692    |
+|all_kinds                      | 12649    |
+|lib_kinds                      | 9709     |
+|unknow_kinds                   | 2940     |
+|gRNAs_kinds                    | 9368     |
+|all/raw_reads_percent          | 0.99894  |
+|valid/all_reads_percent        | 0.902657 |
+|gRNAs/valid_reads_percent      | 0.924742 |
+|gRNAs_coverage                 | 0.964878 |
+|gRNAs_average_all              | 4.29416  |
+|gRNAs_average_present          | 4.45047  |
+
+my_project.log <br />
 reads/frequency/histogram.pdf
 
 ## License
