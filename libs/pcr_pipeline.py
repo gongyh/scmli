@@ -2,6 +2,7 @@
 
 import os
 import sys
+import re
 import pandas as pd
 import numpy as np
 from Bio.SeqIO.QualityIO import FastqGeneralIterator
@@ -26,18 +27,18 @@ def pcr_qc(project_name, read1, read2, FASTQC_PATH=None, TRIM_GALORE_PATH=None, 
     os.system(TRIM_GALORE_BIN + ' --paired --fastqc --max_n 0 -j ' + str(threads) + ' --gzip ' + read1 + ' ' + read2 + '>> pcr_pipeline.log 2>&1')
 
     # Unzip and merge files
-    name11 = read1.split('/')[-1]
-    name11 = name11.split('.f')[0]
-    name12 = name11 + '_val_1.fq.gz'
-    name21 = read2.split('/')[-1]
-    name21 = name21.split('.f')[0]
-    name22 = name21 + '_val_2.fq.gz'
+    name1 = re.split('/',read1)[-1]
+    name1 = re.split('\.fastq|\.fq',name1)[0] 
+    name12 = name1 + '_val_1.fq.gz'
+    name2 = re.split('/',read2)[-1]
+    name2 = re.split('\.fastq|\.fq',name2)[0]
+    name22 = name2 + '_val_2.fq.gz'
     os.system('gzip -cd ' + name12 + ' ' + name22 + ' > ' + project_name + '.fq')
 
     #stats raw_reads
     stats = {}
-    html1 = etree.parse(name11+'_fastqc.html',etree.HTMLParser())
-    html2 = etree.parse(name21+'_fastqc.html',etree.HTMLParser())
+    html1 = etree.parse(name1+'_fastqc.html',etree.HTMLParser())
+    html2 = etree.parse(name2+'_fastqc.html',etree.HTMLParser())
     raw_reads1 = html1.xpath('/html/body/div[3]/div[1]/table/tbody/tr[4]/td[2]')[0].text
     raw_reads2 = html2.xpath('/html/body/div[3]/div[1]/table/tbody/tr[4]/td[2]')[0].text
 

@@ -26,7 +26,7 @@ git clone https://github.com/gongyh/scmli.git
 Python3 (3.9)<br />
 Biopython (1.79) (python package)<br />
 pandas (1.4.2) (python package)<br />
-lxml (4.9.1) (python package)
+lxml (4.9.1) (python package)<br />
 argparse (python package, only needed if python<=3.6)<br />
 fastqc (0.11.9)<br />
 trim-galore>=0.6.0 (0.6.7)<br />
@@ -38,7 +38,7 @@ The tested versions are given in parentheses.
 
 You can install these dependencies using Conda ([Miniconda3](https://docs.conda.io/en/latest/miniconda.html)):
 ```
-conda install -c bioconda pandas biopython fastqc trim-galore>=0.6.0 r-base r-ggplot2
+conda install -c bioconda pandas biopython fastqc lxml trim-galore>=0.6.0 r-base r-ggplot2
 ```
 
 ## Usage
