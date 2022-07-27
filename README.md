@@ -38,7 +38,8 @@ The tested versions are given in parentheses.
 
 You can install these dependencies using Conda ([Miniconda3](https://docs.conda.io/en/latest/miniconda.html)):
 ```
-conda install -c bioconda pandas biopython fastqc lxml trim-galore>=0.6.0 r-base r-ggplot2
+conda install pandas biopython lxml r-base r-ggplot2
+conda install -c bioconda fastqc trim-galore
 ```
 
 ## Usage
@@ -83,9 +84,11 @@ python3 scmli.py -m PCR \
 
 ## Results
 
-my_project.fastqc.html: fastqc results  <br />
-my_project.counts:      count file <br />
-my_project.percent:     the counts and percentage of target sequences <br />
+`file_fastqc.html/zip`: Quality control results(raw data) <br />
+`file_val_1/2_fastqc.html/zip`: Quality control results(clean data) <br />
+`file_trimming_report.txt`: Trim results
+`my_project.counts`:      Raw count result <br />
+`my_project.percent`:     Detailed count result <br />
 
 | gene_id    | sequence             | counts  | percent   |
 | ---------- | -------------------- | ------- | --------- |
@@ -95,9 +98,9 @@ my_project.percent:     the counts and percentage of target sequences <br />
 | NO02G03790 | GAGAACTTTTCATCCTCGCG | 16      | 0.0003549 |
 | .......    | .......              | ....... | ......    |
 
-my_project.stats <br />
+`my_project.stats`: Statistical result <br />
 
-| header1                       | header2  |
+| Key                           | Value    |
 | -------                       | -------  |  
 |raw_reads                      | 50000    |
 |all_reads(clean reads)         | 49947    |
@@ -115,8 +118,11 @@ my_project.stats <br />
 |gRNAs_average_all              | 4.29416  |
 |gRNAs_average_present          | 4.45047  |
 
-my_project.log <br />
-reads/frequency/histogram.pdf
+`unknow.seq`: List of unknow sequences <br />
+`my_project.log`: Process log <br />
+`reads.plot`: Count of different kinds of reads <br />
+`frequency.plot`: Frequency of all gRNAs <br />
+`histogram.plot`: Count of different frequency of gRNAs <br />
 
 ## License
 

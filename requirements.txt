@@ -1,2 +1,3 @@
-Biopython
+biopython
 pandas
+lxml

@@ -53,7 +53,7 @@ CV<-sqrt(Var)/Mean
 frequency<-frequency + geom_text(x=x_range[length(x_range)*0.8],
     y=y_range[2]*0.92,
     aes(label=paste0('Var = ',Var,'\nCV = ',CV)))
-ggsave('frequency.pdf',frequency)
+ggsave('frequency.png',frequency)
 
 #plot3 histogram
 histogram<-ggplot(df_gRNAs,aes(x=gRNAs_percent))+geom_histogram(bins=30,fill='lightblue',color='black') +
