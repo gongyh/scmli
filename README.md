@@ -31,24 +31,28 @@ argparse (python package, only needed if python<=3.6)<br />
 fastqc (0.11.9)<br />
 trim-galore>=0.6.0 (0.6.7)<br />
 r-base (3.6.1)<br />
-r-ggplot2<br />
+r-ggplot2 (3.3.5)<br />
 
 The tested versions are given in parentheses.
 
 
 You can install these dependencies using Conda ([Miniconda3](https://docs.conda.io/en/latest/miniconda.html)):
 ```
-conda install pandas biopython lxml r-base r-ggplot2
-conda install -c bioconda fastqc trim-galore
+conda install -c bioconda fastqc trim-galore pandas biopython lxml r-base r-ggplot2
 ```
 
 ## Usage
 
-Sclmi search `reads` which target sequence had been transferred in. It uses `fixed sequence` (all sequences before gRNAs) for filtering successfully transferred plasmid, then search
-gene sequence with `gene library file`. Target sequence contains fixed sequence and gene sequence, `number(a b)` is used to locate gene sequences in gRNAs.
+Sclmi searches `reads` which have target gRNAs sequence. It uses `fixed sequence` (all sequencing bases before gRNAs in forward reads without adapter) for filtering valid reads, then searches
+gene-special gRNAs sequence with `gRNAs library file`. The gRNAs library sequence contains universal sequence and gene-special sequence, `number(a b)` is used to locate gene-special sequences in gRNAs. <br />
+`gRNAs_library.csv`:  <br />
+NO01G00240,ccgggtccgattcccggtgcctgcaGAGTGTGGTGGAATTTGCCGgttttagagctagaaatagcaagttaaaataag <br />
+NO01G00250,ccgggtccgattcccggtgcctgcaACACGATAGTCAAGACGCTGgttttagagctagaaatagcaagttaaaataag <br />
+  ...... , ...... <br />
 ```
-required: reads(.fq.gz), gene library(.csv), fixed sequence(str)
-usage: scmli.py [-h] [-m {PCR,TEST}] -l LIB -s SEQ -r1 READ1 -r2 READ2 [-num NUMBER NUMBER] [-n OUTPUT_NAME] [-o OUTPUT_DIR]
+required: reads(fastq file), fixed sequence(str), gRNAs library(.csv)
+usage: scmli.py [-h] [-m {PCR,TEST}] -l LIB -s SEQ -r1 READ1 -r2 READ2 
+                [-t THREADS] [--number NUMBER NUMBER] [-n OUTPUT_NAME] [-o OUTPUT_DIR] [--FASTQC_PATH FASTQC_PATH] [--TRIM_GALORE_PATH TRIM_GALORE_PATH]
 ```
 
 ## Arguments
@@ -56,15 +60,17 @@ usage: scmli.py [-h] [-m {PCR,TEST}] -l LIB -s SEQ -r1 READ1 -r2 READ2 [-num NUM
 ```
 required arguments:
   -m {PCR,TEST}, --model {PCR,TEST}          Choose analysis model
-  -l LIB, --lib LIB                          Gene library file
-  -s SEQ, --seq SEQ                          Start with the first base, all sequences before gRNAs
-  -r1 READ1, --read1 READ1                   Read1 file
-  -r2 READ2, --read2 READ2                   Read2 file
+                                             PCR: search gRNAs
+  -l LIB, --lib LIB                          gRNAs library file
+  -s SEQ, --seq SEQ                          All sequencing bases before gRNAs in forward reads without adapter
+  -r1 READ1, --read1 READ1                   Read1 fastq file
+  -r2 READ2, --read2 READ2                   Read2 fastq file
 
 optional arguments:
   -h, --help                                 Show this help message and exit
-  -t NUMBER, --threads NUMBER                Number of threads to use, default = 8
-  --number NUMBER NUMBER                     Start and end of the gene position in gRNAs, default='25 45', from the 26-th to the 45-th bases
+  -t NUMBER, --threads NUMBER                Number of threads, default = 8
+  --number NUMBER NUMBER                     Start and end of the gene-special position in gRNAs,
+                                             default='25 45', from the 26-th to the 45-th bases
   -n OUTPUT_NAME, --output_name OUTPUT_NAME  Prefix of output files, default = "my_project"
   -o OUTPUT_DIR, --output_dir OUTPUT_DIR     Directory of output files, default = "output"
   --FASTQC_PATH                              PATH to fastqc
@@ -86,7 +92,7 @@ python3 scmli.py -m PCR \
 
 `file_fastqc.html/zip`: Quality control results(raw data) <br />
 `file_val_1/2_fastqc.html/zip`: Quality control results(clean data) <br />
-`file_trimming_report.txt`: Trim results
+`file_trimming_report.txt`: Trim results <br />
 `my_project.counts`:      Raw count result <br />
 `my_project.percent`:     Detailed count result <br />
 
