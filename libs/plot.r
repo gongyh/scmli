@@ -107,6 +107,6 @@ ggsave('histogram_detected.pdf',histogram_detected)
 
 #plot4 accumulative_unknow_percentage
 accumulative_unknow_percentage<-ggplot(df_detected,aes(x=seq(1,length(percentage)),y=accumulative_unknow_percentage)) +
-  geom_point(size=0.2) + xlab("Kinds of sequences") + ylab("Cumulative unknow percentage") +
+  geom_point(size=0.2) + xlab("Accumulative kinds of sequences") + ylab("Unknow percentage") +
   theme_bw()
 ggsave('accumulative_unknow_percentage.pdf',accumulative_unknow_percentage)

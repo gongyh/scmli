@@ -97,7 +97,7 @@ python3 scmli.py -m PCR \
 `my_project.percentage`:  Detailed count result <br />
 
 | gene_id    | sequence             | counts  | percentage | accumulative_unknow_percentage |
-| ---------- | -------------------- | ------- | ---------  |                                |
+| ---------- | -------------------- | ------- | ---------- | ------------------------------ |
 | NO12G02480 | TCTATCTCAACAGCCACCCG | 17      | 0.0003771  |                                |
 | NO03G04750 | ACTTCCTGGTCCTCCCACGA | 17      | 0.0003771  |                                |
 | NO08G01490 | TGCCTCAGGAGGGATGATCG | 16      | 0.0003549  |                                |
@@ -131,7 +131,7 @@ python3 scmli.py -m PCR \
 `frequency_detected.plot`: Frequency of detected gRNAs <br />
 `histogram.plot`: Count of different frequency of all gRNAs <br />
 `histogram_detected.plot`: Count of different frequency of detected gRNAs <br />
-`accumulative_unknow_percentage.plot`: percentage of accumulative unknow sequences <br />
+`accumulative_unknow_percentage.plot`: Percentage of accumulative unknow sequences <br />
 
 ## License
 
