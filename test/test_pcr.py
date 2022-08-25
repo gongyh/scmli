@@ -34,7 +34,7 @@ def test_pcr():
     os.chdir(args.output_dir)
     stats = pcr_pipeline(args.output_name, args.read1, args.read2, args.FASTQC_PATH, args.TRIM_GALORE_PATH, args.threads, args.lib, args.seq, args.number)
     os.system('Rscript '+scmli_dir+'/../libs/plot.r '+args.output_name)
-    assert os.path.isfile(args.output_name + ".percent") == True
+    assert os.path.isfile(args.output_name + ".percentage") == True
     assert os.path.isfile("reads.pdf") == True
     assert stats["all_kinds"] == 12649
     os.chdir(current_dir)
