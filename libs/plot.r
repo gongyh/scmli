@@ -14,6 +14,7 @@ names(df_reads)[names(df_reads) == 'Value'] <- 'Counts'
 df_all<-read.table(file =paste0(args[1],'.percentage'),sep = "\t", header = T)
 df_gRNAs<-df_all[df_all$gene_id!='unknow',]
 df_gRNAs_detected<-df_all[(df_all$gene_id!='unknow')&(df_all$counts!=0),]
+df_detected<-df_all[df_all$counts!=0,]
 t<-sum(df_gRNAs$counts)
 df_gRNAs$gRNAs_percentage<-(df_gRNAs$counts/t)*100
 t_detected<-sum(df_gRNAs_detected$counts)
@@ -35,12 +36,14 @@ frequency <- ggplot(df_gRNAs,aes(x=reorder(gene_id,gRNAs_percentage),y=gRNAs_per
   ylab('Frequency(%)') +
   scale_y_continuous(labels = scales::comma) +
   geom_point(size=0.4) +
-  geom_hline(aes(yintercept = mean(gRNAs_percentage)),linetype=2,color='red') +
+  geom_hline(aes(yintercept = mean(gRNAs_percentage)),linetype=2,color='red', show.legend = TRUE) +
   geom_hline(aes(yintercept = quantile(gRNAs_percentage,0.75))) +
   geom_hline(aes(yintercept = quantile(gRNAs_percentage,0.25))) +
   geom_hline(aes(yintercept = median(gRNAs_percentage))) +
+  scale_fill_discrete(limits = c("Average(red), Quartile(black)")) +
   theme(axis.title.x=element_text(size=16),
-        axis.title.y=element_text(size=16))
+        axis.title.y=element_text(size=16),
+        legend.position="bottom")
 frequency <- frequency + aes(x=seq(1,length(gRNAs_percentage)))+scale_x_continuous()+xlab('Each kind of gRNAs')
 
 #add text
@@ -60,12 +63,14 @@ frequency_detected <- ggplot(df_gRNAs_detected,aes(x=reorder(gene_id,gRNAs_perce
   ylab('Frequency(%)') +
   scale_y_continuous(labels = scales::comma) +
   geom_point(size=0.4) +
-  geom_hline(aes(yintercept = mean(gRNAs_percentage)),linetype=2,color='red') +
+  geom_hline(aes(yintercept = mean(gRNAs_percentage)),linetype=2,color='red', show.legend = TRUE) +
   geom_hline(aes(yintercept = quantile(gRNAs_percentage,0.75))) +
   geom_hline(aes(yintercept = quantile(gRNAs_percentage,0.25))) +
   geom_hline(aes(yintercept = median(gRNAs_percentage))) +
+  scale_fill_discrete(limits = c("Average(red), Quartile(black)")) +
   theme(axis.title.x=element_text(size=16),
-        axis.title.y=element_text(size=16))
+        axis.title.y=element_text(size=16),
+        legend.position="bottom")
 frequency_detected <- frequency_detected + aes(x=seq(1,length(gRNAs_percentage)))+scale_x_continuous()+xlab('Each kind of gRNAs')
 
 #add text
@@ -77,7 +82,7 @@ CV<-sqrt(Var)/Mean
 frequency_detected<-frequency_detected + geom_text(x=x_range[2]*0.8,
     y=y_range[2]*0.92,
     aes(label=paste0('Var = ',Var,'\nCV = ',CV)))
-ggsave('frequency_detected.png',frequency_detected)
+ggsave('frequency_detected.pdf',frequency_detected)
 
 
 #plot3(1/2) histogram
@@ -88,7 +93,7 @@ histogram<-ggplot(df_gRNAs,aes(x=gRNAs_percentage))+geom_histogram(bins=30,fill=
   theme(axis.text.x = element_text(size=12),
         axis.title.x= element_text(size=16),
         axis.title.y= element_text(size=16))
-ggsave('histogram.pdf',histogram)
+ggsave('histogram.png',histogram)
 
 #plot3(2/2) histogram_detected
 histogram_detected<-ggplot(df_gRNAs_detected,aes(x=gRNAs_percentage))+geom_histogram(bins=30,fill='lightblue',color='black') +
@@ -101,7 +106,7 @@ histogram_detected<-ggplot(df_gRNAs_detected,aes(x=gRNAs_percentage))+geom_histo
 ggsave('histogram_detected.pdf',histogram_detected)
 
 #plot4 cumulative_unknow_percentage
-cumulative_unknow_percentage<-ggplot(df_all,aes(x=seq(1,length(percentage)),y=cumulative_unknow_percentage)) +
+cumulative_unknow_percentage<-ggplot(df_detected,aes(x=seq(1,length(percentage)),y=cumulative_unknow_percentage)) +
   geom_point(size=0.2) + xlab("Kinds of sequences") + ylab("Cumulative unknow percentage") +
   theme_bw()
 ggsave('cumulative_unknow_percentage.pdf',cumulative_unknow_percentage)
