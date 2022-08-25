@@ -105,8 +105,8 @@ histogram_detected<-ggplot(df_gRNAs_detected,aes(x=gRNAs_percentage))+geom_histo
         axis.title.y= element_text(size=16))
 ggsave('histogram_detected.pdf',histogram_detected)
 
-#plot4 cumulative_unknow_percentage
-cumulative_unknow_percentage<-ggplot(df_detected,aes(x=seq(1,length(percentage)),y=cumulative_unknow_percentage)) +
+#plot4 accumulative_unknow_percentage
+accumulative_unknow_percentage<-ggplot(df_detected,aes(x=seq(1,length(percentage)),y=accumulative_unknow_percentage)) +
   geom_point(size=0.2) + xlab("Kinds of sequences") + ylab("Cumulative unknow percentage") +
   theme_bw()
-ggsave('cumulative_unknow_percentage.pdf',cumulative_unknow_percentage)
+ggsave('accumulative_unknow_percentage.pdf',accumulative_unknow_percentage)

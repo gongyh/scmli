@@ -139,20 +139,20 @@ def pcr_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thre
 
     print("stats......")
     df1 = pd.read_csv(project_name + '.counts', sep='\t', header=None,
-                  names=["gene_id", "sequence", "counts", "percentage","cumulative_unknow_percentage"])
+                  names=["gene_id", "sequence", "counts", "percentage","accumulative_unknow_percentage"])
     t = df1.counts.sum()
     df1.percentage = (df1.counts/t)*100
     df1.loc[:, 'percentage'] = df1.loc[:, 'percentage'].round(6)
     df1 = df1.sort_values(by='counts', ascending=False)
     df1 = df1.reset_index(drop=True)
-    #cumulative_unknow_percentage
-    cumulative_unknow = 0
-    cumulative_all = 0
+    #accumulative_unknow_percentage
+    accumulative_unknow = 0
+    accumulative_all = 0
     for i in range(0,len(df1)):
-        cumulative_all += df1.counts[i]
+        accumulative_all += df1.counts[i]
         if df1.loc[i,"gene_id"] == "unknow":
-            cumulative_unknow += df1.counts[i]
-        df1.loc[i,"cumulative_unknow_percentage"] = round((cumulative_unknow/cumulative_all)*100,3)
+            accumulative_unknow += df1.counts[i]
+        df1.loc[i,"accumulative_unknow_percentage"] = round((accumulative_unknow/accumulative_all)*100,3)
 
     df1.to_csv(project_name + '.percentage', sep='\t', index=False)
 

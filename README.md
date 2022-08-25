@@ -94,22 +94,22 @@ python3 scmli.py -m PCR \
 `file_val_1/2_fastqc.html/zip`: Quality control results(clean data) <br />
 `file_trimming_report.txt`: Trim results <br />
 `my_project.counts`:      Raw count result <br />
-`my_project.percent`:     Detailed count result <br />
+`my_project.percentage`:  Detailed count result <br />
 
-| gene_id    | sequence             | counts  | percent   |
-| ---------- | -------------------- | ------- | --------- |
-| NO12G02480 | TCTATCTCAACAGCCACCCG | 17      | 0.0003771 |
-| NO03G04750 | ACTTCCTGGTCCTCCCACGA | 17      | 0.0003771 |
-| NO08G01490 | TGCCTCAGGAGGGATGATCG | 16      | 0.0003549 |
-| NO02G03790 | GAGAACTTTTCATCCTCGCG | 16      | 0.0003549 |
-| .......    | .......              | ....... | ......    |
+| gene_id    | sequence             | counts  | percentage | accumulative_unknow_percentage |
+| ---------- | -------------------- | ------- | ---------  |                                |
+| NO12G02480 | TCTATCTCAACAGCCACCCG | 17      | 0.0003771  |                                |
+| NO03G04750 | ACTTCCTGGTCCTCCCACGA | 17      | 0.0003771  |                                |
+| NO08G01490 | TGCCTCAGGAGGGATGATCG | 16      | 0.0003549  |                                |
+| NO02G03790 | GAGAACTTTTCATCCTCGCG | 16      | 0.0003549  |                                |
+| .......    | .......              | ....... | ......     |                                |
 
 `my_project.stats`: Statistical result <br />
 
 | Key                           | Value    |
 | -------                       | -------  |  
-|raw_reads                      | 50000    |
-|all_reads(clean reads)         | 49947    |
+|raw_reads(paired)              | 50000    |
+|all_reads(clean reads,paired)  | 49947    |
 |valid_reads                    | 45085    |
 |unknow_reads                   | 3393     | 
 |gRNAs_reads                    | 41692    |
@@ -118,17 +118,20 @@ python3 scmli.py -m PCR \
 |unknow_kinds                   | 2940     |
 |gRNAs_kinds                    | 9368     |
 |all/raw_reads_percent          | 0.99894  |
-|valid/all_reads_percent        | 0.902657 |
-|gRNAs/valid_reads_percent      | 0.924742 |
+|valid/all_reads_percentage     | 0.902657 |
+|gRNAs/valid_reads_percentage   | 0.924742 |
 |gRNAs_coverage                 | 0.964878 |
 |gRNAs_average_all              | 4.29416  |
-|gRNAs_average_present          | 4.45047  |
+|gRNAs_average_detected         | 4.45047  |
 
 `unknow.seq`: List of unknow sequences <br />
 `my_project.log`: Process log <br />
 `reads.plot`: Count of different kinds of reads <br />
 `frequency.plot`: Frequency of all gRNAs <br />
-`histogram.plot`: Count of different frequency of gRNAs <br />
+`frequency_detected.plot`: Frequency of detected gRNAs <br />
+`histogram.plot`: Count of different frequency of all gRNAs <br />
+`histogram_detected.plot`: Count of different frequency of detected gRNAs <br />
+`accumulative_unknow_percentage.plot`: percentage of accumulative unknow sequences <br />
 
 ## License
 
