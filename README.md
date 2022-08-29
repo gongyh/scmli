@@ -96,13 +96,13 @@ python3 scmli.py -m PCR \
 `my_project.counts`:      Raw count result <br />
 `my_project.percentage`:  Detailed count result <br />
 
-| gene_id    | sequence             | counts  | percentage | accumulative_unknow_percentage |
-| ---------- | -------------------- | ------- | ---------- | ------------------------------ |
-| NO12G02480 | TCTATCTCAACAGCCACCCG | 17      | 0.0003771  |                                |
-| NO03G04750 | ACTTCCTGGTCCTCCCACGA | 17      | 0.0003771  |                                |
-| NO08G01490 | TGCCTCAGGAGGGATGATCG | 16      | 0.0003549  |                                |
-| NO02G03790 | GAGAACTTTTCATCCTCGCG | 16      | 0.0003549  |                                |
-| .......    | .......              | ....... | ......     |                                |
+| gene_id    | sequence             | counts  | percentage | percentage_gRNAs | accumulative_unknow_percentage |
+| ---------- | -------------------- | ------- | ---------- | ---------------- | ------------------------------ |
+| NO12G02480 | TCTATCTCAACAGCCACCCG | 17      | 0.037707   | 0.040775         | 0.0                            |
+| NO03G04750 | ACTTCCTGGTCCTCCCACGA | 17      | 0.037707   | 0.040775         | 0.0                            |
+| NO08G01490 | TGCCTCAGGAGGGATGATCG | 16      | 0.035489   | 0.040775         | 0.0                            |
+| NO02G03790 | GAGAACTTTTCATCCTCGCG | 16      | 0.035489   | 0.040775         | 0.0                            |
+| .......    | .......              | ....... | ......     | ......           | ......                         |
 
 `my_project.stats`: Statistical result <br />
 
@@ -129,8 +129,8 @@ python3 scmli.py -m PCR \
 `reads.plot`: Count of different kinds of reads <br />
 `frequency.plot`: Frequency of all gRNAs <br />
 `frequency_detected.plot`: Frequency of detected gRNAs <br />
-`histogram.plot`: Count of different frequency of all gRNAs <br />
-`histogram_detected.plot`: Count of different frequency of detected gRNAs <br />
+`frequency_distribution.plot`: Count of different frequency of all gRNAs <br />
+`frequency_distribution_detected.plot`: Count of different frequency of detected gRNAs <br />
 `accumulative_unknow_percentage.plot`: Percentage of accumulative unknow sequences <br />
 
 ## License

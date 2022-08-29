@@ -51,8 +51,6 @@ def pcr_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thre
     stats['raw_reads'] = int((int(raw_reads1)+int(raw_reads2))/2)
 
     '''
-    parse and count target sequence
-    lib = args.lib (file.csv)
     fix_seq = args.seq ("GGTAGAATTGGTCGTTGCCATCGACCAGGC")
     '''
 
@@ -139,10 +137,13 @@ def pcr_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thre
 
     print("stats......")
     df1 = pd.read_csv(project_name + '.counts', sep='\t', header=None,
-                  names=["gene_id", "sequence", "counts", "percentage","accumulative_unknow_percentage"])
+                  names=["gene_id", "sequence", "counts", "percentage","percentage_gRNAs","accumulative_unknow_percentage"])
     t = df1.counts.sum()
+    t_gRNAs = df1[df1["gene_id"]!="unknow"].counts.sum()
     df1.percentage = (df1.counts/t)*100
+    df1.percentage_gRNAs = (df1[df1["gene_id"]!="unknow"].counts/t_gRNAs)*100
     df1.loc[:, 'percentage'] = df1.loc[:, 'percentage'].round(6)
+    df1.loc[:, 'percentage_gRNAs'] = df1.loc[:, 'percentage_gRNAs'].round(6)
     df1 = df1.sort_values(by='counts', ascending=False)
     df1 = df1.reset_index(drop=True)
     #accumulative_unknow_percentage

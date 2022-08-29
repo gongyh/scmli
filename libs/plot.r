@@ -82,28 +82,28 @@ CV<-sqrt(Var)/Mean
 frequency_detected<-frequency_detected + geom_text(x=x_range[2]*0.8,
     y=y_range[2]*0.92,
     aes(label=paste0('Var = ',Var,'\nCV = ',CV)))
-ggsave('frequency_detected.pdf',frequency_detected)
+ggsave('frequency_detected.png',frequency_detected)
 
 
-#plot3(1/2) histogram
-histogram<-ggplot(df_gRNAs,aes(x=gRNAs_percentage))+geom_histogram(bins=30,fill='lightblue',color='black') +
+#plot3(1/2) frequency_distribution
+frequency_distribution<-ggplot(df_gRNAs,aes(x=gRNAs_percentage))+geom_histogram(bins=30,fill='lightblue',color='black') +
   geom_vline(aes(xintercept = mean(gRNAs_percentage)),linetype=2) +
   xlab('Frequency(%)') + ylab('Counts') +
   scale_x_continuous(labels = scales::comma) +
   theme(axis.text.x = element_text(size=12),
         axis.title.x= element_text(size=16),
         axis.title.y= element_text(size=16))
-ggsave('histogram.png',histogram)
+ggsave('frequency_distribution.pdf',frequency_distribution)
 
-#plot3(2/2) histogram_detected
-histogram_detected<-ggplot(df_gRNAs_detected,aes(x=gRNAs_percentage))+geom_histogram(bins=30,fill='lightblue',color='black') +
+#plot3(2/2) frequency_distribution_detected
+frequency_distribution_detected<-ggplot(df_gRNAs_detected,aes(x=gRNAs_percentage))+geom_histogram(bins=30,fill='lightblue',color='black') +
   geom_vline(aes(xintercept = mean(gRNAs_percentage)),linetype=2) +
   xlab('Frequency(%)') + ylab('Counts') +
   scale_x_continuous(labels = scales::comma) +
   theme(axis.text.x = element_text(size=12),
         axis.title.x= element_text(size=16),
         axis.title.y= element_text(size=16))
-ggsave('histogram_detected.pdf',histogram_detected)
+ggsave('frequency_distribution_detected.pdf',frequency_distribution_detected)
 
 #plot4 accumulative_unknow_percentage
 accumulative_unknow_percentage<-ggplot(df_detected,aes(x=seq(1,length(percentage)),y=accumulative_unknow_percentage)) +
