@@ -3,40 +3,51 @@
 import argparse
 import os
 from libs.pcr_pipeline import pcr_pipeline
-import pandas as pd
+from libs.variant import variant_pipeline
+from libs.common import existing_file, existing_dir
 
 
 def create_arg_parser():
 
     parser = argparse.ArgumentParser(
         description="single cell mutant library inspertion")
-    parser.add_argument('-m', '--model', default="TEST",
-                        choices=["PCR", "TEST"], help="Choose analysis model")
-    parser.add_argument('-l', '--lib', required=True, help="Gene library")
-    parser.add_argument('-s', '--seq', required=True,
+    subparsers = parser.add_subparsers(help='sub-command help') 
+
+    parser_gRNA = subparsers.add_parser('gRNA', help='search gRNAs')
+    parser_variant = subparsers.add_parser('variant', help='call variant')
+
+    parser_gRNA.add_argument('-l', dest='lib', required=True, type=existing_file, help="Gene library")
+    parser_gRNA.add_argument('-s', dest='seq', required=True,
                         help="The fixed sequence for search")
-    parser.add_argument('-r1', '--read1', required=True, help="Read1")
-    parser.add_argument('-r2', '--read2', required=True, help="Read2")
-    parser.add_argument('-t', '--threads', type=int, default=8, help="Number of threads to use")
-    parser.add_argument('--number', type=int, nargs=2, default=[25, 45], 
+    parser_gRNA.add_argument('-r1', dest='read1', required=True, type=existing_file, help="Read1")
+    parser_gRNA.add_argument('-r2', dest='read2', required=True, type=existing_file, help="Read2")
+    parser_gRNA.add_argument('-t', dest='threads', type=int, default=8, help="Number of threads")
+    parser_gRNA.add_argument('--number', type=int, nargs=2, default=[25, 45], 
                         help="Start and end of the gene position, default='25 45', from the 26-th to the 45-th bases")
-    parser.add_argument('-n', '--output_name', default="my_project",
+    parser_gRNA.add_argument('-n', dest='output_name', default="my_project",
                         help="Prefix of output files, default='my_project'")
-    parser.add_argument('-o', '--output_dir', default="output",
+    parser_gRNA.add_argument('-o', dest='output_dir', default="output",
                         help="Directory of output files, default='output'")
-    parser.add_argument('--FASTQC_PATH', help="PATH to fastqc")
-    parser.add_argument('--TRIM_GALORE_PATH', help="PATH to trim_galore")
+    parser_gRNA.add_argument('--FASTQC_PATH', help="PATH to fastqc")
+    parser_gRNA.add_argument('--TRIM_GALORE_PATH', help="PATH to trim_galore")
+    parser_gRNA.set_defaults(func=gRNA)
+
+    parser_variant.add_argument('-r1', dest='read1', required=True, type=existing_file, help='Read1')
+    parser_variant.add_argument('-r2', dest='read2', required=True, type=existing_file, help='Read2')
+    parser_variant.add_argument('--ref', dest='ref', type=existing_file, help='reference')
+    parser_variant.add_argument('--target', dest='target', required=True, type=existing_file, help='target')
+    parser_variant.add_argument('-t', dest='threads', type=int, default=8, help='Number of threads')
+    parser_variant.add_argument('-n', dest='outname', default='my_project',
+                        help="Prefix of output files, default='my_project'")
+    parser_variant.add_argument('-o', dest='outdir', default='output',
+                        help="Directory of output files, default='output'")
+    parser_variant.set_defaults(func=variant)
 
     return parser
 
 
-def check_args(parser):
-    #parse args
-    args = parser.parse_args()
+def gRNA(args):
     #check and modify args
-    args.read1 = os.path.abspath(args.read1)
-    args.read2 = os.path.abspath(args.read2)
-    args.lib = os.path.abspath(args.lib)
     args.seq = args.seq.upper()
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
@@ -60,30 +71,37 @@ def check_args(parser):
     else:
         pass
 
-    return args
+    current_dir = os.getcwd() # curring working directory
+    scmli_dir = os.path.split(os.path.realpath(__file__))[0] # scmli root directory
+    os.chdir(args.output_dir) # change to output directory
+    os.system('cp '+scmli_dir+'/doc/result.html ./')
+    stats = pcr_pipeline(args.output_name, args.read1, args.read2, args.FASTQC_PATH, args.TRIM_GALORE_PATH, args.threads, args.lib, args.seq, args.number)
+    os.system('Rscript '+scmli_dir+'/libs/plot.r '+args.output_name)
+    print("gRNA Finished")
+    os.chdir(current_dir)
 
+    return stats
+
+def variant(args):
+    if not os.path.exists(args.outdir):
+        os.makedirs(args.outdir)
+    args.outdir = os.path.abspath(args.outdir)
+    current_dir = os.getcwd()
+    scmli_dir = os.path.split(os.path.realpath(__file__))[0]
+    os.chdir(args.outdir)
+    variant_pipeline(args)
+    print("Variant Finished")
+    os.chdir(current_dir)
+    print(args)
 
 if __name__ == "__main__":
     try:
         parser = create_arg_parser()
-        args = check_args(parser)
+        args = parser.parse_args()
+        args.func(args)
     except:
         print("parser error")
         os._exit(0)
-    if args.model == "PCR":
-        current_dir = os.getcwd() # curring working directory
-        scmli_dir = os.path.split(os.path.realpath(__file__))[0] # scmli root directory
-        os.chdir(args.output_dir) # change to output directory
-        os.system('cp '+scmli_dir+'/doc/result.html ./') 
-        stats = pcr_pipeline(args.output_name, args.read1, args.read2, args.FASTQC_PATH, args.TRIM_GALORE_PATH, args.threads, args.lib, args.seq, args.number)
-        os.system('Rscript '+scmli_dir+'/libs/plot.r '+args.output_name)
-        print("Finished")
-        os.chdir(current_dir)
-    elif args.model == "TEST":
-        try:
-            print(args)
-            print(args.number)
-        except:
-            print("test pipline error")
     else:
-        print("model")
+        print("scmli")
+
