@@ -44,7 +44,7 @@ conda install -c bioconda fastqc trim-galore pandas biopython lxml r-base r-ggpl
 ```
 
 ## Usage
-###gRNA model
+### gRNA model
 Sclmi searches `reads` which have target gRNAs sequence. It uses `fixed sequence` (all sequencing bases before gRNAs in forward reads without adapter) for filtering valid reads, then searches
 gene-special gRNAs sequence with `gRNAs library file`. The gRNAs library sequence contains universal sequence and gene-special sequence, `number(a b)` is used to locate gene-special sequences in gRNAs. <br />
 `gRNAs_library.csv`:  <br />
@@ -54,7 +54,7 @@ NO01G00250,ccgggtccgattcccggtgcctgcaACACGATAGTCAAGACGCTGgttttagagctagaaatagcaagt
 ```
 required: reads(fastq file), fixed sequence(str), gRNAs library(.csv)
 ```
-###variant model <br />
+### variant model <br />
 
 ## Arguments
 ### gRNA model
@@ -74,9 +74,9 @@ optional arguments:
   -o OUTPUT_DIR                     Directory of output files, default = "output"
   --FASTQC_PATH                     PATH to fastqc
   --TRIM_GALORE_PATH                PATH to trim-galore
-
 ```
 ### variant model
+```
 required arguments:
   -r1 READ1                         Read1 fastq file
   -r2 READ2                         Read2 fastq file
