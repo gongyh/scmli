@@ -32,17 +32,19 @@ fastqc (0.11.9)<br />
 trim-galore>=0.6.0 (0.6.7)<br />
 r-base (3.6.1)<br />
 r-ggplot2 (3.3.5)<br />
+bcftools (1.15)
+snippy (4.6.0 modified)
 
 The tested versions are given in parentheses.
 
 
 You can install these dependencies using Conda ([Miniconda3](https://docs.conda.io/en/latest/miniconda.html)):
 ```
-conda install -c bioconda fastqc trim-galore pandas biopython lxml r-base r-ggplot2
+conda install -c bioconda fastqc trim-galore pandas biopython lxml r-base r-ggplot2 bcftools snippy
 ```
 
 ## Usage
-
+###gRNA model
 Sclmi searches `reads` which have target gRNAs sequence. It uses `fixed sequence` (all sequencing bases before gRNAs in forward reads without adapter) for filtering valid reads, then searches
 gene-special gRNAs sequence with `gRNAs library file`. The gRNAs library sequence contains universal sequence and gene-special sequence, `number(a b)` is used to locate gene-special sequences in gRNAs. <br />
 `gRNAs_library.csv`:  <br />
@@ -51,45 +53,62 @@ NO01G00250,ccgggtccgattcccggtgcctgcaACACGATAGTCAAGACGCTGgttttagagctagaaatagcaagt
   ...... , ...... <br />
 ```
 required: reads(fastq file), fixed sequence(str), gRNAs library(.csv)
-usage: scmli.py [-h] [-m {PCR,TEST}] -l LIB -s SEQ -r1 READ1 -r2 READ2 
-                [-t THREADS] [--number NUMBER NUMBER] [-n OUTPUT_NAME] [-o OUTPUT_DIR] [--FASTQC_PATH FASTQC_PATH] [--TRIM_GALORE_PATH TRIM_GALORE_PATH]
 ```
+###variant model <br />
 
 ## Arguments
-
+### gRNA model
 ```
 required arguments:
-  -m {PCR,TEST}, --model {PCR,TEST}          Choose analysis model
-                                             PCR: search gRNAs
-  -l LIB, --lib LIB                          gRNAs library file
-  -s SEQ, --seq SEQ                          All sequencing bases before gRNAs in forward reads without adapter
-  -r1 READ1, --read1 READ1                   Read1 fastq file
-  -r2 READ2, --read2 READ2                   Read2 fastq file
+  -l LIB                            gRNAs library file
+  -s SEQ                            All sequencing bases before gRNAs in forward reads without adapter
+  -r1 READ1                         Read1 fastq file
+  -r2 READ2                         Read2 fastq file
 
 optional arguments:
-  -h, --help                                 Show this help message and exit
-  -t NUMBER, --threads NUMBER                Number of threads, default = 8
-  --number NUMBER NUMBER                     Start and end of the gene-special position in gRNAs,
-                                             default='25 45', from the 26-th to the 45-th bases
-  -n OUTPUT_NAME, --output_name OUTPUT_NAME  Prefix of output files, default = "my_project"
-  -o OUTPUT_DIR, --output_dir OUTPUT_DIR     Directory of output files, default = "output"
-  --FASTQC_PATH                              PATH to fastqc
-  --TRIM_GALORE_PATH                         PATH to trim-galore
+  -h, --help                        Show help message and exit
+  -t NUMBER                         Number of threads, default = 8
+  --number NUMBER NUMBER            Start and end of the gene-special position in gRNAs,
+                                    default='25 45', from the 26-th to the 45-th bases
+  -n OUTPUT_NAME                    Prefix of output files, default = "my_project"
+  -o OUTPUT_DIR                     Directory of output files, default = "output"
+  --FASTQC_PATH                     PATH to fastqc
+  --TRIM_GALORE_PATH                PATH to trim-galore
+
+```
+### variant model
+required arguments:
+  -r1 READ1                         Read1 fastq file
+  -r2 READ2                         Read2 fastq file
+  --ref REF                         reference
+  --target TARGET                   target
+
+optional arguments:
+  -h, --help                        show this help message and exit
+  -t THREADS                        Number of threads
+  -n OUTNAME                        Prefix of output files, default='my_project'
+  -o OUTDIR                         Directory of output files, default='output'
 ```
 
 ## Test
 
 ```
 cd scmli
-python3 scmli.py -m PCR \
+python3 scmli.py gRNA \
   -l test/NoIMET1_gRNAs.csv \
   -s GGTAGAATTGGTCGTTGCCATCGACCAGGC \
   -r1 test/test_R1.fq.gz \
   -r2 test/test_R2.fq.gz
+
+python3 scmli.py variant \
+  -r1 test/test_R1.fq.gz \
+  -r2 test/test_R2.fq.gz \
+  --ref test/genes.gbk \
+  --target test/targets.bed
 ```
 
 ## Results
-
+### gRNA model
 `file_fastqc.html/zip`: Quality control results(raw data) <br />
 `file_val_1/2_fastqc.html/zip`: Quality control results(clean data) <br />
 `file_trimming_report.txt`: Trim results <br />
@@ -132,6 +151,8 @@ python3 scmli.py -m PCR \
 `frequency_distribution.plot`: Count of different frequency of all gRNAs <br />
 `frequency_distribution_detected.plot`: Count of different frequency of detected gRNAs <br />
 `accumulative_unknow_percentage.plot`: Percentage of accumulative unknow sequences <br />
+
+### variant model
 
 ## License
 
