@@ -24,7 +24,7 @@ def test_pcr():
         '-r2','test_R2.fq.gz'])
    
     stats = args.func(args)
-    assert os.path.isfile("../output/reads.pdf") == True
+    assert os.path.isfile("output/reads.pdf") == True
     assert stats["all_kinds"] == 12649
 
 
@@ -38,5 +38,5 @@ def test_variant():
         '--ref','genes.gbk',
         '--target','targets.bed'])
     stats = args.func(args)
-    assert os.path.isfile('../output/my_project_snippy_hq.vcf') == True
+    assert os.path.isfile('output/my_project_snippy_hq.vcf') == True
 
