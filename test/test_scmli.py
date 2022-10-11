@@ -32,5 +32,5 @@ def test_variant():
         '--ref','genes.gbk',
         '--target','targets.bed'])
     stats = args.func(args)
-    assert os.path.isfile('output/my_project_snippy_hq.vcf') == True
+    assert os.path.getsize('output/my_project_snippy_hq.vcf') > 10
 

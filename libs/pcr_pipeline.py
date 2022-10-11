@@ -31,10 +31,10 @@ def pcr_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thre
 
     # Unzip and merge files
     name1 = re.split('/', read1)[-1]
-    name1 = re.split('\.fastq|\.fq', name1)[0]
+    name1 = re.split('.fastq|.fq', name1)[0]
     name12 = name1 + '_val_1.fq.gz'
     name2 = re.split('/', read2)[-1]
-    name2 = re.split('\.fastq|\.fq', name2)[0]
+    name2 = re.split('.fastq|.fq', name2)[0]
     name22 = name2 + '_val_2.fq.gz'
     os.system('gzip -cd ' + name12 + ' ' +
               name22 + ' > ' + project_name + '.fq')
