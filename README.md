@@ -32,7 +32,7 @@ fastqc (0.11.9)<br />
 trim-galore>=0.6.0 (0.6.7)<br />
 r-base (3.6.1)<br />
 r-ggplot2 (3.3.5)<br />
-bcftools (1.15)
+bcftools (1.15)<br />
 snippy (4.6.0 modified)
 
 The tested versions are given in parentheses.
@@ -55,7 +55,7 @@ NO01G00250,ccgggtccgattcccggtgcctgcaACACGATAGTCAAGACGCTGgttttagagctagaaatagcaagt
 required: reads(fastq file), fixed sequence(str), gRNAs library(.csv)
 ```
 ### variant model <br />
-
+we changed the parameters in snippy, copy lib/snippy to path/bin/snippy
 ## Arguments
 ### gRNA model
 ```
@@ -153,7 +153,8 @@ python3 scmli.py variant \
 `accumulative_unknow_percentage.plot`: Percentage of accumulative unknow sequences <br />
 
 ### variant model
-
+`my_project_snippy_hq.vcf`: Result of variant
+`my_project_snippy_hq.gids`: Number of variant
 ## License
 
 MIT

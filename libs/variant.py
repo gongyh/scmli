@@ -16,7 +16,7 @@ def variant_pipeline(args):
     name2 = re.split('.fastq|.fq', name2)[0]+'_val_2.fq.gz'
 
     os.system('mkdir tmp')
-    os.system('snippy --cpus %d --ram 40 --basequal 30 --minqual 0.0 --minfrac 0.0 --report --outdir %s_snippy --tmpdir tmp --ref %s --R1 %s --R2 %s >> pcr_pipeline.log 2>&1'%(args.threads,args.outname,args.ref,name1,name2))
+    os.system('snippy --cpus %d --ram 40 --basequal 30 --minqual 0.0 --minfrac 0.0 --report --outdir %s_snippy --tmpdir tmp --ref %s --R1 %s --R2 %s >> variant.log 2>&1'%(args.threads,args.outname,args.ref,name1,name2))
 
     os.system('bcftools view -e "(INFO/AO)/(INFO/DP)>0.5" -T %s %s_snippy/snps.vcf.gz > %s_snippy_hq.vcf'%(args.target,args.outname,args.outname))
 
