@@ -7,7 +7,7 @@ sys.path.append("..")
 from scmli import create_arg_parser
 
 
-def test_gRNA():
+def test_grna():
     # parameters
     parser = create_arg_parser()
     

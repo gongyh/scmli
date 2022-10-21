@@ -9,7 +9,7 @@ from Bio.SeqIO.QualityIO import FastqGeneralIterator
 from lxml import etree
 
 
-def pcr_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, threads, lib, fix_seq, number):
+def grna_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, threads, lib, fix_seq, number, scmli_dir):
 
     # Fastqc
     print("fastqc......")
@@ -18,7 +18,7 @@ def pcr_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thre
     else:
         FASTQC_BIN = 'fastqc'
     os.system(FASTQC_BIN + ' -o . ' + read1 + ' ' +
-              read2 + '> pcr_pipeline.log 2>&1')
+              read2 + '> grna_pipeline.log 2>&1')
 
     # Trim_galore
     print("trim_galore......")
@@ -27,7 +27,7 @@ def pcr_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thre
     else:
         TRIM_GALORE_BIN = 'trim_galore'
     os.system(TRIM_GALORE_BIN + ' --paired --fastqc --max_n 0 -j ' +
-              str(threads) + ' --gzip ' + read1 + ' ' + read2 + '>> pcr_pipeline.log 2>&1')
+              str(threads) + ' --gzip ' + read1 + ' ' + read2 + '>> grna_pipeline.log 2>&1')
 
     # Unzip and merge files
     name1 = re.split('/', read1)[-1]
@@ -156,7 +156,16 @@ def pcr_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thre
         df1.loc[i,"accumulative_unknow_percentage"] = round((accumulative_unknow/accumulative_all)*100,3)
 
     df1.to_csv(project_name + '.percentage', sep='\t', index=False)
+    #add bed format
+    df2=df1
+    df2=df2[df2['gene_id']!='unknow']
+    df2=df2[df2['counts']!=0]
+    df3=pd.read_csv(scmli_dir+'/test/targets.bed',sep='\t',header=None,names=['chrom','chromStart','chromEnd','name','score','strand'])
+    df2=pd.merge(df2,df3,left_on='gene_id',right_on='name')
+    df2=df2[['chrom','chromStart','chromEnd','name','score','strand','sequence','counts','percentage','percentage_gRNAs','accumulative_unknow_percentage']]
+    df2.to_csv('targets_grna.bed',sep='\t',header=None,index=False)
 
+    print('stat2')
     stats['valid_reads'] = np.sum(df1.counts)
     stats['unknow_reads'] = np.sum(df1.loc[df1.gene_id == 'unknow', 'counts'])
     df_gRNAs = df1[(df1.gene_id != 'unknow') & (df1.counts != 0)].copy()

@@ -2,7 +2,7 @@
 
 import argparse
 import os
-from libs.pcr_pipeline import pcr_pipeline
+from libs.grna import grna_pipeline
 from libs.variant import variant_pipeline
 from libs.common import existing_file, existing_dir
 
@@ -36,6 +36,7 @@ def create_arg_parser():
     parser_variant.add_argument('-r2', dest='read2', required=True, type=existing_file, help='Read2')
     parser_variant.add_argument('--ref', dest='ref', type=existing_file, help='reference')
     parser_variant.add_argument('--target', dest='target', required=True, type=existing_file, help='target')
+    parser_variant.add_argument('--dtarget', dest='dtarget', required=True, type=existing_file, help='dtarget')
     parser_variant.add_argument('-t', dest='threads', type=int, default=8, help='Number of threads')
     parser_variant.add_argument('-n', dest='outname', default='my_project',
                         help="Prefix of output files, default='my_project'")
@@ -75,9 +76,9 @@ def gRNA(args):
     scmli_dir = os.path.split(os.path.realpath(__file__))[0] # scmli root directory
     os.chdir(args.output_dir) # change to output directory
     os.system('cp '+scmli_dir+'/doc/result.html ./')
-    stats = pcr_pipeline(args.output_name, args.read1, args.read2, args.FASTQC_PATH, args.TRIM_GALORE_PATH, args.threads, args.lib, args.seq, args.number)
+    stats = grna_pipeline(args.output_name, args.read1, args.read2, args.FASTQC_PATH, args.TRIM_GALORE_PATH, args.threads, args.lib, args.seq, args.number, scmli_dir)
     os.system('Rscript '+scmli_dir+'/libs/plot.r '+args.output_name)
-    print("gRNA Finished")
+    print("grna Finished")
     os.chdir(current_dir)
 
     return stats
