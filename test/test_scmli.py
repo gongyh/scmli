@@ -30,7 +30,8 @@ def test_variant():
         '-r1','test_R1.fq.gz',
         '-r2','test_R2.fq.gz',
         '--ref','genes.gbk',
-        '--target','targets.bed'])
+        '--target','targets.bed',
+        '--dtarget','filter.bed'])
     stats = args.func(args)
     assert os.path.getsize('output/my_project_snippy_hq.vcf') > 10
 
