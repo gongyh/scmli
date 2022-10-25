@@ -11,7 +11,7 @@ def create_arg_parser():
 
     parser = argparse.ArgumentParser(
         description="single cell mutant library inspertion")
-    subparsers = parser.add_subparsers(help='sub-command help') 
+    subparsers = parser.add_subparsers(help='sub-command help')
 
     parser_gRNA = subparsers.add_parser('gRNA', help='search gRNAs')
     parser_variant = subparsers.add_parser('variant', help='call variant')
@@ -22,7 +22,7 @@ def create_arg_parser():
     parser_gRNA.add_argument('-r1', dest='read1', required=True, type=existing_file, help="Read1")
     parser_gRNA.add_argument('-r2', dest='read2', required=True, type=existing_file, help="Read2")
     parser_gRNA.add_argument('-t', dest='threads', type=int, default=8, help="Number of threads")
-    parser_gRNA.add_argument('--number', type=int, nargs=2, default=[25, 45], 
+    parser_gRNA.add_argument('--number', type=int, nargs=2, default=[25, 45],
                         help="Start and end of the gene position, default='25 45', from the 26-th to the 45-th bases")
     parser_gRNA.add_argument('-n', dest='output_name', default="my_project",
                         help="Prefix of output files, default='my_project'")
@@ -48,12 +48,12 @@ def create_arg_parser():
 
 
 def gRNA(args):
-    #check and modify args
+    # check and modify args
     args.seq = args.seq.upper()
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
     args.output_dir = os.path.abspath(args.output_dir)
-    #check software path 
+    # check software path 
     if args.FASTQC_PATH:
         if os.path.isdir(args.FASTQC_PATH) and (os.path.isfile(args.FASTQC_PATH+"/fastqc") or os.path.isfile(args.FASTQC_PATH+"fastqc")):
             args.FASTQC_PATH = os.path.abspath(args.FASTQC_PATH)
@@ -72,9 +72,9 @@ def gRNA(args):
     else:
         pass
 
-    current_dir = os.getcwd() # curring working directory
+    current_dir = os.getcwd()  # curring working directory
     scmli_dir = os.path.split(os.path.realpath(__file__))[0] # scmli root directory
-    os.chdir(args.output_dir) # change to output directory
+    os.chdir(args.output_dir)  # change to output directory
     os.system('cp '+scmli_dir+'/doc/result.html ./')
     stats = grna_pipeline(args.output_name, args.read1, args.read2, args.FASTQC_PATH, args.TRIM_GALORE_PATH, args.threads, args.lib, args.seq, args.number, scmli_dir)
     os.system('Rscript '+scmli_dir+'/libs/plot.r '+args.output_name)
