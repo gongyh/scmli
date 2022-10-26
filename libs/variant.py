@@ -7,7 +7,8 @@ import pandas as pd
 
 def variant_pipeline(args):
     print('trim...')
-    os.system('trim_galore --cores 8 --paired -q 30 --trim-n --max_n 0 --length 70 --gzip %s %s > variant.log 2>&1'%(args.read1, args.read2))
+    trim_threads = args.threads if args.threads < 8 else 8
+    os.system('trim_galore --cores %d --paired -q 30 --trim-n --max_n 0 --length 70 --gzip %s %s > variant.log 2>&1'%(trim_threads, args.read1, args.read2))
 
     name1 = re.split('/', args.read1)[-1]
     name1 = re.split('.fastq|.fq', name1)[0]+'_val_1.fq.gz'
@@ -17,7 +18,9 @@ def variant_pipeline(args):
     print('snippy...')
     os.system('mkdir tmp')
     os.system('snippy --cpus %d --ram 40 --basequal 30 --minqual 0.0 --minfrac 0.0 --report --outdir %s_snippy --tmpdir tmp --ref %s --R1 %s --R2 %s >> variant.log 2>&1'%(args.threads,args.outname,args.ref,name1,name2))
-
+    os.system('cd %s_snippy'%args.outname)
+    os.popen('snippy -h').read()
+    os.system('cd ..')
     print('search deletion')
     row = re.findall('\d+', os.popen('grep "##" %s_snippy/snps.vcf | wc -l'%args.outname).read())[0]
     df1 = pd.read_csv(args.outname+'_snippy/snps.vcf',sep='\t',skiprows=int(row))
@@ -46,7 +49,7 @@ def variant_pipeline(args):
     os.system('cat del_target2.bed >> snp_del_target2.bed')
     os.system('bcftools view -e "(INFO/AO)/(INFO/DP)>0.5" -T snp_del_target2.bed %s_snippy/snps.vcf.gz > %s_snippy_target2.vcf'%(args.outname,args.outname))
     os.system("cat %s_snippy_target2.vcf | grep -v '^#' | cut -f8 | awk -F',' '{print $1}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_target2.gids"%(args.outname,args.outname))
-'''
+
     df3=pd.read_csv(args.dtarget,sep='\t',header=None,names=['chrom','chromStart','chromEnd','name','score','strand','sequence','counts','percentage','percentage_gRNAs','accumulative_unknow_percentage'])
     df3['variant']=0
     df3['info']=''
@@ -58,4 +61,4 @@ def variant_pipeline(args):
         df3.loc[df3['name']==a,'variant'] += 1
         df3.loc[df3['name']==a,'info'] += '%s,%s,%s,%s;'%(df4.iloc[i,0],df4.iloc[i,1],df4.iloc[i,3],df4.iloc[i,4])
     df3.to_csv('target2_variant.txt',sep='\t',index=False)
-'''    
+
