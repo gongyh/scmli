@@ -30,7 +30,7 @@ jobs:
       run: |
         #conda info
         #conda list
-        conda install -n test pandas biopython lxml fastqc trim-galore>=0.6.0 flake8 pytest r-base r-ggplot2 snpEff=5.0 snippy bcftools
+        conda install -n test pandas biopython lxml fastqc trim-galore>=0.6.0 flake8 pytest r-base r-ggplot2 snpEff=5.0 snippy=4.6 bcftools
     - name: Check out repository code
       uses: actions/checkout@v3
     - name: Lint with flake8
