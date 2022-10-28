@@ -137,33 +137,36 @@ def grna_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thr
 
     print("stats......")
     df1 = pd.read_csv(project_name + '.counts', sep='\t', header=None,
-                  names=["gene_id", "sequence", "counts", "percentage","percentage_gRNAs","accumulative_unknow_percentage"])
+                      names=["gene_id", "sequence", "counts", "percentage", "percentage_gRNAs", "accumulative_unknow_percentage"])
     t = df1.counts.sum()
-    t_gRNAs = df1[df1["gene_id"]!="unknow"].counts.sum()
+    t_gRNAs = df1[df1["gene_id"] != "unknow"].counts.sum()
     df1.percentage = (df1.counts/t)*100
-    df1.percentage_gRNAs = (df1[df1["gene_id"]!="unknow"].counts/t_gRNAs)*100
+    df1.percentage_gRNAs = (df1[df1["gene_id"] != "unknow"].counts/t_gRNAs)*100
     df1.loc[:, 'percentage'] = df1.loc[:, 'percentage'].round(6)
     df1.loc[:, 'percentage_gRNAs'] = df1.loc[:, 'percentage_gRNAs'].round(6)
     df1 = df1.sort_values(by='counts', ascending=False)
     df1 = df1.reset_index(drop=True)
-    #accumulative_unknow_percentage
+    # accumulative_unknow_percentage
     accumulative_unknow = 0
     accumulative_all = 0
-    for i in range(0,len(df1)):
+    for i in range(0, len(df1)):
         accumulative_all += df1.counts[i]
-        if df1.loc[i,"gene_id"] == "unknow":
+        if df1.loc[i, "gene_id"] == "unknow":
             accumulative_unknow += df1.counts[i]
-        df1.loc[i,"accumulative_unknow_percentage"] = round((accumulative_unknow/accumulative_all)*100,3)
+        df1.loc[i, "accumulative_unknow_percentage"] = round(
+            (accumulative_unknow/accumulative_all)*100, 3)
 
     df1.to_csv(project_name + '.percentage', sep='\t', index=False)
-    #add bed format
-    df2=df1
-    df2=df2[df2['gene_id']!='unknow']
-    df2=df2[df2['counts']!=0]
-    df3=pd.read_csv(scmli_dir+'/test/targets.bed',sep='\t',header=None,names=['chrom','chromStart','chromEnd','name','score','strand'])
-    df2=pd.merge(df2,df3,left_on='gene_id',right_on='name')
-    df2=df2[['chrom','chromStart','chromEnd','name','score','strand','sequence','counts','percentage','percentage_gRNAs','accumulative_unknow_percentage']]
-    df2.to_csv('targets_grna.bed',sep='\t',header=None,index=False)
+    # add bed format
+    df2 = df1
+    df2 = df2[df2['gene_id'] != 'unknow']
+    df2 = df2[df2['counts'] != 0]
+    df3 = pd.read_csv(scmli_dir+'/test/targets.bed', sep='\t', header=None,
+                      names=['chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand'])
+    df2 = pd.merge(df2, df3, left_on='gene_id', right_on='name')
+    df2 = df2[['chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'sequence',
+               'counts', 'percentage', 'percentage_gRNAs', 'accumulative_unknow_percentage']]
+    df2.to_csv('targets_grna.bed', sep='\t', header=None, index=False)
 
     print('stat2')
     stats['valid_reads'] = np.sum(df1.counts)
@@ -182,7 +185,7 @@ def grna_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thr
         stats['gRNAs_reads'] / stats['valid_reads'], 6)
     stats['gRNAs_coverage'] = round(stats['gRNAs_kinds']/stats['lib_kinds'], 6)
     stats['gRNAs_average_all'] = round(np.average(
-          df1.loc[df1.gene_id != 'unknow', 'counts']), 6)
+        df1.loc[df1.gene_id != 'unknow', 'counts']), 6)
     stats['gRNAs_average_appeared'] = round(np.average(df_gRNAs.counts), 6)
     with open(project_name+'.stats', 'w') as filestats:
         for a, b in stats.items():
