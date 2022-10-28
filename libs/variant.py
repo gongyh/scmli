@@ -21,7 +21,8 @@ def variant_pipeline(args):
     os.system('snippy --cpus %d --ram 40 --basequal 30 --minqual 0.0 --minfrac 0.0 --report --outdir %s_snippy --tmpdir tmp --ref %s --R1 %s --R2 %s >> variant.log 2>&1' %
               (args.threads, args.outname, args.ref, name1, name2))
     os.system('cd %s_snippy' % args.outname)
-    os.popen('snippy -h').read()
+    print(os.popen('snippy -h').read())
+    print(os.popen('ls').read())
     os.system('cd ..')
     print('search deletion')
     row = re.findall(
