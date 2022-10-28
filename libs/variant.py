@@ -22,8 +22,9 @@ def variant_pipeline(args):
               (args.threads, args.outname, args.ref, name1, name2))
     print(os.popen('snippy -h').read())
     print(os.popen('cat variant.log').read())
+    print(os.popen('cat my_project_snippy/snps.log').read())
     print(os.popen('ls').read())
-    print(os.popen('ls ..').read())
+    print(os.popen('ls my_project_snippy').read())
     print('search deletion')
     row = re.findall(
         r'\d+', os.popen('grep "##" %s_snippy/snps.vcf | wc -l' % args.outname).read())[0]
