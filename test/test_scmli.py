@@ -1,11 +1,10 @@
-from scmli import create_arg_parser
 import pytest
 import sys
 import os
 import argparse
 import pandas as pd
 sys.path.append("..")
-
+from scmli import create_arg_parser
 
 def test_grna():
     # parameters
