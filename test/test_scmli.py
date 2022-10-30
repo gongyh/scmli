@@ -28,6 +28,7 @@ def test_variant():
         'variant',
         '-r1', 'test_R1.fq.gz',
         '-r2', 'test_R2.fq.gz',
+        '-t', '2',
         '--ref', 'genes.gbk',
         '--target', 'targets.bed',
         '--dtarget', 'filter.bed'])
