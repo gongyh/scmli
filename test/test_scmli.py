@@ -14,6 +14,7 @@ def test_grna():
         'gRNA',
         '-l', 'NoIMET1_gRNAs.csv',
         '-s', 'GGTAGAATTGGTCGTTGCCATCGACCAGGC',
+        '-t', '2',
         '-r1', 'test_R1.fq.gz',
         '-r2', 'test_R2.fq.gz'])
 
