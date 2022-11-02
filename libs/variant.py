@@ -18,7 +18,7 @@ def variant_pipeline(args):
 
     print('snippy...')
     os.system('mkdir tmp')
-    os.system('snippy --cpus %d --ram 40 --basequal 30 --minqual 0.0 --minfrac 0.0 --report --outdir %s_snippy --tmpdir tmp --ref %s --R1 %s --R2 %s >> variant.log 2>&1' %
+    os.system('snippy --cpus %d --ram 4 --basequal 30 --minqual 0.0 --minfrac 0.0 --report --outdir %s_snippy --tmpdir tmp --ref %s --R1 %s --R2 %s >> variant.log 2>&1' %
               (args.threads, args.outname, args.ref, name1, name2))
     print(os.popen('cat variant.log').read())
     print(os.popen('cat my_project_snippy/snps.log').read())
