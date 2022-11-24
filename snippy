@@ -389,9 +389,9 @@ my @cmd = (
   "fasta_generate_regions.py $refdir/ref.fa.fai $chunk_size > $refdir/ref.txt",
   "freebayes-parallel $refdir/ref.txt $cpus $fbopt -f $refdir/ref.fa $prefix.bam > $prefix.raw.vcf",
   # for SNP, DP>=2
-  "bcftools view -v snps,mnps -i 'FMT/DP>=2' $prefix.raw.vcf > $prefix.raw1.vcf",
+  "bcftools view -v snps,mnps -i 'FMT/AO>=2' $prefix.raw.vcf > $prefix.raw1.vcf",
   # for Indel, DP>=1
-  "bcftools view -v indels -i 'FMT/DP>=1' $prefix.raw.vcf > $prefix.raw2.vcf",
+  "bcftools view -v indels -i 'FMT/AO>=1' $prefix.raw.vcf > $prefix.raw2.vcf",
   # merge filtered SNP and Indel
   "bcftools concat $prefix.raw1.vcf $prefix.raw2.vcf > $prefix.raw12.vcf",
   # only keep homozygous and normalize(trim) REF/ALT and remove most tags
