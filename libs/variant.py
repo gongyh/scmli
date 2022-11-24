@@ -20,10 +20,6 @@ def variant_pipeline(args):
     os.system('mkdir tmp')
     os.system('snippy --cpus %d --ram 4 --minqual 0.0 --minfrac 0.0 --report --outdir %s_snippy --tmpdir tmp --ref %s --R1 %s --R2 %s >> variant.log 2>&1' %
               (args.threads, args.outname, args.ref, name1, name2))
-    print(os.popen('cat variant.log').read())
-    print(os.popen('cat my_project_snippy/snps.log').read())
-    print(os.popen('ls').read())
-    print(os.popen('ls my_project_snippy').read())
     print('search deletion')
     row = re.findall(
         r'\d+', os.popen('grep "##" %s_snippy/snps.vcf | wc -l' % args.outname).read())[0]
@@ -42,28 +38,32 @@ def variant_pipeline(args):
                 f.write(line)
     os.system(
         'bedtools intersect -a del.bed -b %s -wa -wb > del_target.bed' % args.target)
-    os.system('cat %s > snp_del_target.bed' % args.target)
-    os.system('cat del_target.bed >> snp_del_target.bed')
 
     print('filter...')
     os.system('bcftools view -e "QUAL>1" -T %s %s_snippy/snps.vcf.gz > %s_snippy_hq.vcf' %
               (args.target, args.outname, args.outname))
-    os.system('bcftools view -e "QUAL>1" -T snp_del_target.bed %s_snippy/snps.vcf.gz > %s_snippy_target.vcf' %
+    os.system('bcftools view -v indels -e "QUAL>1" -T del_target.bed %s_snippy/snps.vcf.gz > %s_snippy_del_target.vcf' %
               (args.outname, args.outname))
+    os.system('bcftools concat %s_snippy_hq.vcf %s_snippy_del_target.vcf > %s_snippy_target.vcf' %
+              (args.outname, args.outname, args.outname))
     os.system(
-        "cat %s_snippy_hq.vcf | grep -v '^#' | cut -f8 | awk -F',' '{print $1}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_hq.gids" % (args.outname, args.outname))
+        "cat %s_snippy_hq.vcf | grep -v '^#' | cut -f8 | awk -F'|' '{print $1,$2,$3,$4,$5}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_hq.gids" % (args.outname, args.outname))
     os.system(
-        "cat %s_snippy_target.vcf | grep -v '^#' | cut -f8 | awk -F',' '{print $1}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_target.gids" % (args.outname, args.outname))
+        "cat %s_snippy_target.vcf | grep -v '^#' | cut -f8 | awk -F'|' '{print $1,$2,$3,$4,$5}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_target.gids" % (args.outname, args.outname))
 
+    #target2
     os.system(
         'bedtools intersect -a del.bed -b %s -wa -wb > del_target2.bed' % args.dtarget)
-    os.system('cat %s > snp_del_target2.bed' % args.dtarget)
-    os.system('cat del_target2.bed >> snp_del_target2.bed')
-    os.system('bcftools view -e "QUAL>1" -T snp_del_target2.bed %s_snippy/snps.vcf.gz > %s_snippy_target2.vcf' %
+    os.system('bcftools view -e "QUAL>1" -T %s %s_snippy/snps.vcf.gz > %s_snippy_target2_raw.vcf' %
+              (args.dtarget, args.outname, args.outname))
+    os.system('bcftools view -v indels -e "QUAL>1" -T del_target2.bed %s_snippy/snps.vcf.gz > %s_snippy_del_target2.vcf' %
               (args.outname, args.outname))
+    os.system('bcftools concat %s_snippy_target2_raw.vcf %s_snippy_del_target2.vcf > %s_snippy_target2.vcf' %
+              (args.dtarget, args.outname, args.outname))
     os.system(
         "cat %s_snippy_target2.vcf | grep -v '^#' | cut -f8 | awk -F',' '{print $1}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_target2.gids" % (args.outname, args.outname))
 
+    #stats
     df3 = pd.read_csv(args.dtarget, sep='\t', header=None, names=[
                       'chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'sequence', 'counts', 'percentage', 'percentage_gRNAs', 'accumulative_unknow_percentage'])
     df3['variant'] = 0

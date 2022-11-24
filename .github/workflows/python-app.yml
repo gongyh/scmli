@@ -45,5 +45,5 @@ jobs:
       shell: bash -l {0}
       run: |
         cd ${{ github.workspace }}/test
-        cp -f ../snippy /usr/share/miniconda/envs/test/bin/
+        cp -f ../lib/snippy /usr/share/miniconda/envs/test/bin/
         pytest
