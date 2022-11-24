@@ -8,7 +8,7 @@ import pandas as pd
 def variant_pipeline(args):
     print('trim...')
     trim_threads = args.threads if args.threads < 8 else 8
-    os.system('trim_galore --cores %d --paired -q 30 --trim-n --max_n 0 --length 70 --gzip %s %s > variant.log 2>&1' %
+    os.system('trim_galore --cores %d --paired -q 20 --trim-n --max_n 0 --length 70 --gzip %s %s > variant.log 2>&1' %
               (trim_threads, args.read1, args.read2))
 
     name1 = re.split('/', args.read1)[-1]
@@ -46,9 +46,9 @@ def variant_pipeline(args):
     os.system('cat del_target.bed >> snp_del_target.bed')
 
     print('filter...')
-    os.system('bcftools view -e "(INFO/AO)/(INFO/DP)>0.5" -T %s %s_snippy/snps.vcf.gz > %s_snippy_hq.vcf' %
+    os.system('bcftools view -e "QUAL>1" -T %s %s_snippy/snps.vcf.gz > %s_snippy_hq.vcf' %
               (args.target, args.outname, args.outname))
-    os.system('bcftools view -e "(INFO/AO)/(INFO/DP)>0.5" -T snp_del_target.bed %s_snippy/snps.vcf.gz > %s_snippy_target.vcf' %
+    os.system('bcftools view -e "QUAL>1" -T snp_del_target.bed %s_snippy/snps.vcf.gz > %s_snippy_target.vcf' %
               (args.outname, args.outname))
     os.system(
         "cat %s_snippy_hq.vcf | grep -v '^#' | cut -f8 | awk -F',' '{print $1}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_hq.gids" % (args.outname, args.outname))
@@ -59,7 +59,7 @@ def variant_pipeline(args):
         'bedtools intersect -a del.bed -b %s -wa -wb > del_target2.bed' % args.dtarget)
     os.system('cat %s > snp_del_target2.bed' % args.dtarget)
     os.system('cat del_target2.bed >> snp_del_target2.bed')
-    os.system('bcftools view -e "(INFO/AO)/(INFO/DP)>0.5" -T snp_del_target2.bed %s_snippy/snps.vcf.gz > %s_snippy_target2.vcf' %
+    os.system('bcftools view -e "QUAL>1" -T snp_del_target2.bed %s_snippy/snps.vcf.gz > %s_snippy_target2.vcf' %
               (args.outname, args.outname))
     os.system(
         "cat %s_snippy_target2.vcf | grep -v '^#' | cut -f8 | awk -F',' '{print $1}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_target2.gids" % (args.outname, args.outname))
