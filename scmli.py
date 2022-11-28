@@ -47,6 +47,8 @@ def create_arg_parser():
     parser_variant.add_argument(
         '--dtarget', dest='dtarget', required=True, type=existing_file, help='dtarget')
     parser_variant.add_argument(
+        '--ram', dest='ram', type=int, default=4, help='ram GB')
+    parser_variant.add_argument(
         '-t', dest='threads', type=int, default=8, help='Number of threads')
     parser_variant.add_argument('-n', dest='outname', default='my_project',
                                 help="Prefix of output files, default='my_project'")
