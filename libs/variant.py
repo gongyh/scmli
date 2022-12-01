@@ -40,7 +40,7 @@ def variant_pipeline(args):
     os.system(
         'bedtools intersect -a del.bed -b %s -wa -wb > del_target.bed' % args.target)
     with open('del_target.bed', 'a') as f:
-        f.write('chr1\t1\t2\n')
+        f.write('chr2\t1\t2\n')
     # target1 (9709), concat in target and deletion overlap
     print('filter...')
     os.system('bcftools view -e "QUAL>1" -T %s -O z -o %s_snippy_hq.vcf.gz %s_snippy/snps.vcf.gz' %
@@ -49,7 +49,7 @@ def variant_pipeline(args):
               (args.outname, args.outname))
     os.system('bcftools index %s_snippy_hq.vcf.gz' %args.outname)
     os.system('bcftools index %s_snippy_del_target.vcf.gz' %args.outname)
-    os.system('bcftools concat %s_snippy_hq.vcf.gz %s_snippy_del_target.vcf.gz -o %s_snippy_target.vcf >> variant.log 2>&1' %
+    os.system('bcftools concat -a %s_snippy_hq.vcf.gz %s_snippy_del_target.vcf.gz -o %s_snippy_target.vcf >> variant.log 2>&1' %
               (args.outname, args.outname, args.outname))
     os.system(
         "zcat %s_snippy_hq.vcf.gz | grep -v '^#' | cut -f8 | awk -F'|' '{print $1,$2,$3,$4,$5}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_hq.gids" % (args.outname, args.outname))
@@ -60,17 +60,17 @@ def variant_pipeline(args):
     os.system(
         'bedtools intersect -a del.bed -b %s -wa -wb > del_target2.bed' % args.dtarget)
     with open('del_target2.bed', 'a') as f:
-        f.write('chr1\t1\t2\n')
+        f.write('chr2\t1\t2\n')
     os.system('bcftools view -e "QUAL>1" -T %s -O z -o %s_snippy_raw_target2.vcf.gz %s_snippy/snps.vcf.gz' %
               (args.dtarget, args.outname, args.outname))
     os.system('bcftools view -v indels -e "QUAL>1" -T del_target2.bed -O z -o %s_snippy_del_target2.vcf.gz %s_snippy/snps.vcf.gz' %
               (args.outname, args.outname))
     os.system('bcftools index %s_snippy_raw_target2.vcf.gz' %args.outname)
     os.system('bcftools index %s_snippy_del_target2.vcf.gz' %args.outname)
-    os.system('bcftools concat %s_snippy_raw_target2.vcf.gz %s_snippy_del_target2.vcf.gz -o %s_snippy_target2.vcf >> variant.log 2>&1' %
+    os.system('bcftools concat -a %s_snippy_raw_target2.vcf.gz %s_snippy_del_target2.vcf.gz -o %s_snippy_target2.vcf >> variant.log 2>&1' %
               (args.outname, args.outname, args.outname))
     os.system(
-        "cat %s_snippy_target2.vcf | grep -v '^#' | cut -f8 | awk -F',' '{print $1}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_target2.gids" % (args.outname, args.outname))
+        "cat %s_snippy_target2.vcf | grep -v '^#' | cut -f8 | awk -F'|' '{print $1,$2,$3,$4,$5}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_target2.gids" % (args.outname, args.outname))
 
     #stats add info to txt
     df3 = pd.read_csv(args.dtarget, sep='\t', header=None, names=[
