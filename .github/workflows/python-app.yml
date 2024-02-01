@@ -18,10 +18,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Check out repository code
+      uses: actions/checkout@v3
     - name: Cache conda
       uses: actions/cache@v3
       env:
-        # Increase this value to reset cache if etc/example-environment.yml has not changed
+        # Increase this value to reset cache if requirements.txt has not changed
         CACHE_NUMBER: 0
       with:
         path: ~/conda_pkgs_dir
@@ -41,8 +43,6 @@ jobs:
         conda info
         mamba install -n test pandas biopython lxml fastqc trim-galore>=0.6.0 flake8 pytest r-base r-ggplot2 snpEff=5.0 snippy=4.6 bcftools
         conda list
-    - name: Check out repository code
-      uses: actions/checkout@v3
     - name: Lint with flake8
       shell: bash -el {0}
       run: |
