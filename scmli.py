@@ -110,8 +110,7 @@ def variant(args):
     os.chdir(current_dir)
     print(args)
 
-
-if __name__ == "__main__":
+def main():
     try:
         parser = create_arg_parser()
         args = parser.parse_args()
@@ -121,3 +120,6 @@ if __name__ == "__main__":
         os._exit(0)
     else:
         print("scmli")
+
+if __name__ == "__main__":
+    main()
