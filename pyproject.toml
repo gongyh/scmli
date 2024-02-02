@@ -27,5 +27,6 @@ path = "doc/__init__.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "/doc",
+    "/libs",
+    "scmli.py",
 ]
