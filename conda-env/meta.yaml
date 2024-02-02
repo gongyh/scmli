@@ -1,0 +1,45 @@
+{% set name = "scmli" %}
+{% set version = "0.0.1-alpha" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://github.com/gongyh/scmli/archive/v{{ version }}.tar.gz
+  sha256: 1b83bd1c81b48ebc4087165fbe77ab5e24753188f0b6ac18c783be2e6c472df4
+
+build:
+  entry_points:
+    - scmli = scmli:main
+  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  number: 0
+
+requirements:
+  host:
+    - python >=3.0
+    - pip
+  run:
+    - python >=3.0
+    - biopython
+    - pandas
+    - lxml
+
+test:
+  imports:
+    - doc
+    - libs
+  commands:
+    - pip check
+    - scmli --help
+  requires:
+    - pip
+
+about:
+  license: MIT
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - gongyh
