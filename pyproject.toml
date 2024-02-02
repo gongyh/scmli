@@ -30,3 +30,9 @@ include = [
     "/libs",
     "scmli.py",
 ]
+
+[tool.hatch.build.targets.wheel]
+include = [
+    "/libs",
+    "scmli.py",
+]
