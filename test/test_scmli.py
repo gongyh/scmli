@@ -5,6 +5,10 @@ import argparse
 import pandas as pd
 sys.path.append("..")
 from scmli import create_arg_parser
+from shutil import rmtree
+
+def setup_function():
+    rmtree("output")
 
 def test_grna():
     # parameters

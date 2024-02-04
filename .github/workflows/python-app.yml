@@ -41,7 +41,7 @@ jobs:
       shell: bash -el {0}
       run: |
         conda info
-        mamba install -n test pandas biopython lxml fastqc trim-galore>=0.6.0 flake8 pytest r-base r-ggplot2 snpEff=5.0 snippy=4.6 bcftools
+        mamba install -n test pandas biopython lxml fastqc trim-galore>=0.6.0 flake8 pytest r-base r-ggplot2 snpEff=5.0 snippy=4.6 bioconda::tabixpp=1.1.0 bcftools
         conda list
     - name: Lint with flake8
       shell: bash -el {0}
