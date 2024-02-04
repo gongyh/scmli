@@ -3,16 +3,14 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - conda-forge::python=3
+  - conda-forge::python>=3
   - conda-forge::biopython
   - conda-forge::pandas
-  - lxml
-  - fastqc
-  - trim-galore>=0.6.0
-  - flake8
-  - pytest
-  - r-ggplot2
-  - snpEff=5.0
-  - snippy=4.6
+  - conda-forge::lxml
+  - bioconda::fastqc
+  - bioconda::trim-galore>=0.6.0
+  - conda-forge::r-ggplot2
+  - bioconda::snpeff=5.0
+  - bioconda::snippy=4.6
   - bioconda::tabixpp=1.1.0
-  - bcftools
+  - bioconda::bcftools
