@@ -27,10 +27,10 @@ requirements:
     - lxml
     - fastqc
     - trim-galore >=0.6.0
-    - r-base =3.6.1
     - r-ggplot2
     - bcftools
     - snippy =4.6.0
+    - tabixpp =1.1.0
 
 test:
   imports:
