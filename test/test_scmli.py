@@ -8,7 +8,8 @@ from scmli import create_arg_parser
 from shutil import rmtree
 
 def setup_function():
-    rmtree("output")
+    if os.path.exists("output"):
+        rmtree("output")
 
 def test_grna():
     # parameters
