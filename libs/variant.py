@@ -2,13 +2,13 @@
 
 import os
 import re
+import subprocess
 import pandas as pd
 
 
 def variant_pipeline(args):
     print('trim......')
     trim_threads = min(args.threads, 8)
-
     cmd = [
         'trim_galore',
         '--cores', str(trim_threads),
@@ -28,9 +28,8 @@ def variant_pipeline(args):
     name2 = re.split(r'/', args.read2)[-1]
     name2 = re.split(r'\.fastq|\.fq', name2)[0] + '_val_2.fq.gz'
 
-    print('snippy...')
+    print('call variants......')
     os.makedirs('tmp', exist_ok=True)
-
     cmd = [
         'snippy',
         '--cpus', str(args.threads),
@@ -46,13 +45,12 @@ def variant_pipeline(args):
         '--R2', name2
     ]
 
-    # 执行命令，并将输出追加到 variant.log 文件
-    with open('variant.log', 'a') as log_file: # 'a' 模式用于追加内容
+    with open('variant.log', 'a') as log_file:
         subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT)
 
     os.system('snippy --cpus %d --ram %d --basequal 30 --minqual 0.0 --minfrac 0.0 --report --outdir %s_snippy --tmpdir tmp --ref %s --R1 %s --R2 %s >> variant.log 2>&1' %
               (args.threads, args.ram, args.outname, args.ref, name1, name2))
-    print('search deletion')
+    print('search deletion......')
     row = re.findall(
         r'\d+', os.popen('grep "##" %s_snippy/snps.vcf | wc -l' % args.outname).read())[0]
     df1 = pd.read_csv(args.outname+'_snippy/snps.vcf',

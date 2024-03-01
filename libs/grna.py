@@ -9,29 +9,33 @@ import numpy as np
 from Bio.SeqIO.QualityIO import FastqGeneralIterator
 from lxml import etree
 
-
+# grna pipeline
 def grna_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, threads, lib, fix_seq, number, scmli_dir):
 
-    # quality control
+    # quality control, use fastqc
     print("quality control......")
+    # check path
     if FASTQC_PATH:
         FASTQC_BIN = os.path.join(FASTQC_PATH, 'fastqc')
     else:
         FASTQC_BIN = 'fastqc'
 
+    # run and save log
     cmd = [FASTQC_BIN, '-o', '.', read1, read2]
     with open('grna_pipeline.log', 'a') as log_file:
         result = subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT)
     if result.returncode != 0:
         print("FastQC failed with return code:", result.returncode)
 
-    # trim
+    # trim, use trim_galore
     print("trim......")
+    # check path
     if TRIM_GALORE_PATH:
         TRIM_GALORE_BIN = os.path.join(TRIM_GALORE_PATH, 'trim_galore')
     else:
         TRIM_GALORE_BIN = 'trim_galore'
 
+    # run and save log
     cmd = [TRIM_GALORE_BIN, '--paired', '--fastqc', '--max_n',
            '0', '-j', str(threads), '--gzip', read1, read2]
     with open('grna_pipeline.log', 'a') as log_file:
@@ -52,8 +56,8 @@ def grna_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thr
     with open(f'{project_name}.fq', 'w') as output_file:
         result = subprocess.run(cmd, stdout=output_file)
 
-    # stats raw_reads
-    stats = {}
+    # stats, get raw_reads number from fastqc result
+    stats = {} 
     html1 = etree.parse(name1+'_fastqc.html', etree.HTMLParser())
     html2 = etree.parse(name2+'_fastqc.html', etree.HTMLParser())
     raw_reads1 = html1.xpath(
