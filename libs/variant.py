@@ -6,18 +6,50 @@ import pandas as pd
 
 
 def variant_pipeline(args):
-    print('trim...')
-    trim_threads = args.threads if args.threads < 8 else 8
-    os.system('trim_galore --cores %d --paired -q 20 --trim-n --max_n 0 --length 70 --gzip %s %s > variant.log 2>&1' %
-              (trim_threads, args.read1, args.read2))
+    print('trim......')
+    trim_threads = min(args.threads, 8)
 
-    name1 = re.split('/', args.read1)[-1]
-    name1 = re.split('.fastq|.fq', name1)[0]+'_val_1.fq.gz'
-    name2 = re.split('/', args.read2)[-1]
-    name2 = re.split('.fastq|.fq', name2)[0]+'_val_2.fq.gz'
+    cmd = [
+        'trim_galore',
+        '--cores', str(trim_threads),
+        '--paired',
+        '-q', '20',
+        '--trim-n',
+        '--max_n', '0',
+        '--length', '70',
+        '--gzip',
+        args.read1, args.read2
+    ]
+    with open('variant.log', 'w') as log_file:
+        subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT)
+
+    name1 = re.split(r'/', args.read1)[-1]
+    name1 = re.split(r'\.fastq|\.fq', name1)[0] + '_val_1.fq.gz'
+    name2 = re.split(r'/', args.read2)[-1]
+    name2 = re.split(r'\.fastq|\.fq', name2)[0] + '_val_2.fq.gz'
 
     print('snippy...')
-    os.system('mkdir tmp')
+    os.makedirs('tmp', exist_ok=True)
+
+    cmd = [
+        'snippy',
+        '--cpus', str(args.threads),
+        '--ram', str(args.ram),
+        '--basequal', '30',
+        '--minqual', '0.0',
+        '--minfrac', '0.0',
+        '--report',
+        '--outdir', f'{args.outname}_snippy',
+        '--tmpdir', 'tmp',
+        '--ref', args.ref,
+        '--R1', name1,
+        '--R2', name2
+    ]
+
+    # 执行命令，并将输出追加到 variant.log 文件
+    with open('variant.log', 'a') as log_file: # 'a' 模式用于追加内容
+        subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT)
+
     os.system('snippy --cpus %d --ram %d --basequal 30 --minqual 0.0 --minfrac 0.0 --report --outdir %s_snippy --tmpdir tmp --ref %s --R1 %s --R2 %s >> variant.log 2>&1' %
               (args.threads, args.ram, args.outname, args.ref, name1, name2))
     print('search deletion')
@@ -47,8 +79,8 @@ def variant_pipeline(args):
               (args.target, args.outname, args.outname))
     os.system('bcftools view -v indels -e "QUAL>1" -T del_target.bed -O z -o %s_snippy_del_target.vcf.gz %s_snippy/snps.vcf.gz' %
               (args.outname, args.outname))
-    os.system('bcftools index %s_snippy_hq.vcf.gz' %args.outname)
-    os.system('bcftools index %s_snippy_del_target.vcf.gz' %args.outname)
+    os.system('bcftools index %s_snippy_hq.vcf.gz' % args.outname)
+    os.system('bcftools index %s_snippy_del_target.vcf.gz' % args.outname)
     os.system('bcftools concat -a %s_snippy_hq.vcf.gz %s_snippy_del_target.vcf.gz -o %s_snippy_target.vcf >> variant.log 2>&1' %
               (args.outname, args.outname, args.outname))
     os.system(
@@ -56,7 +88,7 @@ def variant_pipeline(args):
     os.system(
         "cat %s_snippy_target.vcf | grep -v '^#' | cut -f8 | awk -F'|' '{print $1,$2,$3,$4,$5}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_target.gids" % (args.outname, args.outname))
 
-    # target2 (24), concat 
+    # target2 (24), concat
     os.system(
         'bedtools intersect -a del.bed -b %s -wa -wb > del_target2.bed' % args.dtarget)
     with open('del_target2.bed', 'a') as f:
@@ -65,14 +97,14 @@ def variant_pipeline(args):
               (args.dtarget, args.outname, args.outname))
     os.system('bcftools view -v indels -e "QUAL>1" -T del_target2.bed -O z -o %s_snippy_del_target2.vcf.gz %s_snippy/snps.vcf.gz' %
               (args.outname, args.outname))
-    os.system('bcftools index %s_snippy_raw_target2.vcf.gz' %args.outname)
-    os.system('bcftools index %s_snippy_del_target2.vcf.gz' %args.outname)
+    os.system('bcftools index %s_snippy_raw_target2.vcf.gz' % args.outname)
+    os.system('bcftools index %s_snippy_del_target2.vcf.gz' % args.outname)
     os.system('bcftools concat -a %s_snippy_raw_target2.vcf.gz %s_snippy_del_target2.vcf.gz -o %s_snippy_target2.vcf >> variant.log 2>&1' %
               (args.outname, args.outname, args.outname))
     os.system(
         "cat %s_snippy_target2.vcf | grep -v '^#' | cut -f8 | awk -F'|' '{print $1,$2,$3,$4,$5}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_target2.gids" % (args.outname, args.outname))
 
-    #stats add info to txt
+    # stats add info to txt
     df3 = pd.read_csv(args.dtarget, sep='\t', header=None, names=[
                       'chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'sequence', 'counts', 'percentage', 'percentage_gRNAs', 'accumulative_unknow_percentage'])
     df3['variant'] = 0

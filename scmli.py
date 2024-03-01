@@ -67,7 +67,8 @@ def gRNA(args):
     args.output_dir = os.path.abspath(args.output_dir)
     # check software path
     if args.FASTQC_PATH:
-        if os.path.isdir(args.FASTQC_PATH) and (os.path.isfile(args.FASTQC_PATH+"/fastqc") or os.path.isfile(args.FASTQC_PATH+"fastqc")):
+        fastqc_executable = os.path.join(args.FASTQC_PATH, "fastqc")
+        if os.path.isdir(args.FASTQC_PATH) and os.path.isfile(fastqc_executable):
             args.FASTQC_PATH = os.path.abspath(args.FASTQC_PATH)
         else:
             print("path to fastqc error")
@@ -76,7 +77,8 @@ def gRNA(args):
         pass
 
     if args.TRIM_GALORE_PATH:
-        if os.path.isdir(args.TRIM_GALORE_PATH) and (os.path.isfile(args.TRIM_GALORE_PATH+"/trim_galore") or os.path.isfile(args.TRIM_GALORE_PATH+"trim_galore")):
+        trim_galore_executable = os.path.join(args.TRIM_GALORE_PATH, "fastqc")
+        if os.path.isdir(args.TRIM_GALORE_PATH) and os.path.isfile(trim_galore_executable):
             args.TRIM_GALORE_PATH = os.path.abspath(args.TRIM_GALORE_PATH)
         else:
             print("path to trim_galore error")
@@ -110,6 +112,7 @@ def variant(args):
     os.chdir(current_dir)
     print(args)
 
+
 def main():
     try:
         parser = create_arg_parser()
@@ -120,6 +123,7 @@ def main():
         os._exit(0)
     else:
         print("scmli")
+
 
 if __name__ == "__main__":
     main()
