@@ -10,18 +10,18 @@ from Bio.SeqIO.QualityIO import FastqGeneralIterator
 from lxml import etree
 
 # grna pipeline
-def grna_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, threads, lib, fix_seq, number, scmli_dir):
+def grna_pipeline(args, project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, threads, lib, fix_seq, number, scmli_dir):
 
     # quality control, use fastqc
     print("quality control......")
     # check path
-    if FASTQC_PATH:
-        FASTQC_BIN = os.path.join(FASTQC_PATH, 'fastqc')
+    if args.FASTQC_PATH:
+        FASTQC_BIN = os.path.join(args.FASTQC_PATH, 'fastqc')
     else:
         FASTQC_BIN = 'fastqc'
 
     # run and save log
-    cmd = [FASTQC_BIN, '-o', '.', read1, read2]
+    cmd = [FASTQC_BIN, '-o', '.', args.read1, args.read2]
     with open('grna_pipeline.log', 'a') as log_file:
         result = subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT)
     if result.returncode != 0:
@@ -30,30 +30,30 @@ def grna_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thr
     # trim, use trim_galore
     print("trim......")
     # check path
-    if TRIM_GALORE_PATH:
-        TRIM_GALORE_BIN = os.path.join(TRIM_GALORE_PATH, 'trim_galore')
+    if args.TRIM_GALORE_PATH:
+        TRIM_GALORE_BIN = os.path.join(args.TRIM_GALORE_PATH, 'trim_galore')
     else:
         TRIM_GALORE_BIN = 'trim_galore'
 
     # run and save log
     cmd = [TRIM_GALORE_BIN, '--paired', '--fastqc', '--max_n',
-           '0', '-j', str(threads), '--gzip', read1, read2]
+           '0', '-j', str(args.threads), '--gzip', args.read1, args.read2]
     with open('grna_pipeline.log', 'a') as log_file:
         result = subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT)
     if result.returncode != 0:
         print("Trim galore failed with return code:", result.returncode)
 
     # Unzip qc/trim output files and merge
-    name1_base = re.split(r'/', read1)[-1]
+    name1_base = re.split(r'/', args.read1)[-1]
     name1 = re.split(r'\.fastq|\.fq', name1_base)[0]
     name12 = name1 + '_val_1.fq.gz'
 
-    name2_base = re.split(r'/', read2)[-1]
+    name2_base = re.split(r'/', args.read2)[-1]
     name2 = re.split(r'\.fastq|\.fq', name2_base)[0]
     name22 = name2 + '_val_2.fq.gz'
 
     cmd = ['gzip', '-cd', name12, name22]
-    with open(f'{project_name}.fq', 'w') as output_file:
+    with open(f'{args.outname}.fq', 'w') as output_file:
         result = subprocess.run(cmd, stdout=output_file)
 
     # stats, get raw_reads number from fastqc result
@@ -75,15 +75,15 @@ def grna_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thr
     # {'GAGTGTGGTGGAATTTGCCG': 'NO01G00240', ...}
     gRNA_gene = {}
     lib_kinds = 0
-    with open(lib) as fh:
+    with open(args.lib) as fh:
         for line in fh:
             cl = line.split(',')
             gene = cl[0]
-            gRNA = cl[1][number[0]:number[1]]
+            gRNA = cl[1][args.number[0]:args.number[1]]
             gRNA_gene[gRNA] = gene
             lib_kinds += 1
 
-    fix_seq_len = len(fix_seq)
+    fix_seq_len = len(args.seq)
     gRNAs_dict = {}
     for i in gRNA_gene.keys():
         gRNAs_dict[i] = 0
@@ -92,13 +92,13 @@ def grna_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thr
     # Get fixed sequence from file.fastq and count
     # {'GAGTGTGGTGGAATTTGCCG': 3, ...}
 
-    with open(project_name + '.fq') as handle:
+    with open(args.outname + '.fq') as handle:
         file_unknow = open('unknow.seq', 'w')
         for (title, seq, quality) in FastqGeneralIterator(handle):
             read_counts += 1
-            if seq[0:fix_seq_len] == fix_seq:  # valid record
+            if seq[0:fix_seq_len] == args.seq:  # valid record
                 # change left and right equal
-                gRNA = seq[fix_seq_len+number[0]:fix_seq_len+number[1]]
+                gRNA = seq[fix_seq_len+args.number[0]:fix_seq_len+args.number[1]]
                 if gRNA in gRNAs_dict_original.keys():  # gRNAs
                     gRNAs_dict[gRNA] += 1
                 elif gRNA in gRNAs_dict.keys():
@@ -116,7 +116,7 @@ def grna_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thr
     # NO01G00240  GAGTGTGGTGGAATTTGCCG  3
     # unknow      CCCCCCCCCCGAGTGTGGTG  1
 
-    with open(project_name+'.counts', 'w') as f:
+    with open(args.outname+'.counts', 'w') as f:
         for k, v in gRNAs_dict.items():
             gene = 'unknow'
             if k in gRNA_gene.keys():
@@ -126,7 +126,7 @@ def grna_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thr
     # Statistics
     # fixed_seq, e.g. GGTAGAATTGGTCGTTGCCATCGACCAGGC
     print("stats......")
-    df1 = pd.read_csv(project_name + '.counts', sep='\t', header=None,
+    df1 = pd.read_csv(args.outname + '.counts', sep='\t', header=None,
                       names=["gene_id", "sequence", "counts", "percentage", "percentage_gRNAs", "accumulative_unknow_percentage"])
     # percentage
     t = df1.counts.sum()
@@ -148,7 +148,7 @@ def grna_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thr
         df1.loc[i, "accumulative_unknow_percentage"] = round(
             (accumulative_unknow/accumulative_all)*100, 3)
 
-    df1.to_csv(project_name + '.percentage', sep='\t', index=False)
+    df1.to_csv(args.outname + '.percentage', sep='\t', index=False)
 
     # Mutation target region bed file
     df2 = df1
@@ -181,7 +181,7 @@ def grna_pipeline(project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, thr
     stats['gRNAs_average_all'] = round(np.average(
         df1.loc[df1.gene_id != 'unknow', 'counts']), 6)
     stats['gRNAs_average_appeared'] = round(np.average(df_gRNAs.counts), 6)
-    with open(project_name+'.stats', 'w') as stats_file:
+    with open(args.outname+'.stats', 'w') as stats_file:
         for a, b in stats.items():
             stats_file.write('%s\t%s\n' % (a, b))
 
