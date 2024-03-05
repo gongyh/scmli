@@ -10,7 +10,7 @@ from Bio.SeqIO.QualityIO import FastqGeneralIterator
 from lxml import etree
 
 # grna pipeline
-def grna_pipeline(args, project_name, read1, read2, FASTQC_PATH, TRIM_GALORE_PATH, threads, lib, fix_seq, number, scmli_dir):
+def grna_pipeline(args, scmli_dir):
 
     # quality control, use fastqc
     print("quality control......")
