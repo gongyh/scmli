@@ -12,30 +12,28 @@ from lxml import etree
 # grna pipeline
 def grna_pipeline(args, scmli_dir):
 
-    # quality control, use fastqc
     print("quality control......")
-    # check path
+    # Check if FASTQC path is given, if not set to fastqc
     if args.FASTQC_PATH:
         FASTQC_BIN = os.path.join(args.FASTQC_PATH, 'fastqc')
     else:
         FASTQC_BIN = 'fastqc'
 
-    # run and save log
+    # Run fastqc
     cmd = [FASTQC_BIN, '-o', '.', args.read1, args.read2]
     with open('grna_pipeline.log', 'a') as log_file:
         result = subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT)
     if result.returncode != 0:
         print("FastQC failed with return code:", result.returncode)
 
-    # trim, use trim_galore
     print("trim......")
-    # check path
+    # Check if Trim Galore path is given, if not set to trim_galore
     if args.TRIM_GALORE_PATH:
         TRIM_GALORE_BIN = os.path.join(args.TRIM_GALORE_PATH, 'trim_galore')
     else:
         TRIM_GALORE_BIN = 'trim_galore'
 
-    # run and save log
+    # Run trim_galore
     cmd = [TRIM_GALORE_BIN, '--paired', '--fastqc', '--max_n',
            '0', '-j', str(args.threads), '--gzip', args.read1, args.read2]
     with open('grna_pipeline.log', 'a') as log_file:
@@ -52,11 +50,13 @@ def grna_pipeline(args, scmli_dir):
     name2 = re.split(r'\.fastq|\.fq', name2_base)[0]
     name22 = name2 + '_val_2.fq.gz'
 
+    # Unzip the files and merge them into one file
     cmd = ['gzip', '-cd', name12, name22]
-    with open(f'{args.outname}.fq', 'w') as output_file:
+    with open(f'{args.output_name}.fq', 'w') as output_file:
         result = subprocess.run(cmd, stdout=output_file)
 
-    # stats, get raw_reads number from fastqc result
+    # Stats
+    # Extract the number of raw reads from fastqc result HTML files
     stats = {} 
     html1 = etree.parse(name1+'_fastqc.html', etree.HTMLParser())
     html2 = etree.parse(name2+'_fastqc.html', etree.HTMLParser())
@@ -70,7 +70,6 @@ def grna_pipeline(args, scmli_dir):
     # fix_seq = args.seq("GGTAGAATTGGTCGTTGCCATCGACCAGGC")
     # search gRNAs
     print("search......")
-
     # Get the gRNA_gene dictionary {seq: id, ...} from lib file
     # {'GAGTGTGGTGGAATTTGCCG': 'NO01G00240', ...}
     gRNA_gene = {}
@@ -89,10 +88,10 @@ def grna_pipeline(args, scmli_dir):
         gRNAs_dict[i] = 0
     gRNAs_dict_original = gRNAs_dict.copy()
     read_counts = 0
+
     # Get fixed sequence from file.fastq and count
     # {'GAGTGTGGTGGAATTTGCCG': 3, ...}
-
-    with open(args.outname + '.fq') as handle:
+    with open(args.output_name + '.fq') as handle:
         file_unknow = open('unknow.seq', 'w')
         for (title, seq, quality) in FastqGeneralIterator(handle):
             read_counts += 1
@@ -115,8 +114,7 @@ def grna_pipeline(args, scmli_dir):
     # Change count format and add gRNA_gene id
     # NO01G00240  GAGTGTGGTGGAATTTGCCG  3
     # unknow      CCCCCCCCCCGAGTGTGGTG  1
-
-    with open(args.outname+'.counts', 'w') as f:
+    with open(args.output_name+'.counts', 'w') as f:
         for k, v in gRNAs_dict.items():
             gene = 'unknow'
             if k in gRNA_gene.keys():
@@ -126,19 +124,19 @@ def grna_pipeline(args, scmli_dir):
     # Statistics
     # fixed_seq, e.g. GGTAGAATTGGTCGTTGCCATCGACCAGGC
     print("stats......")
-    df1 = pd.read_csv(args.outname + '.counts', sep='\t', header=None,
+    df1 = pd.read_csv(args.output_name + '.counts', sep='\t', header=None,
                       names=["gene_id", "sequence", "counts", "percentage", "percentage_gRNAs", "accumulative_unknow_percentage"])
-    # percentage
+    # Percentage
     t = df1.counts.sum()
     t_gRNAs = df1[df1["gene_id"] != "unknow"].counts.sum()
     df1.percentage = (df1.counts/t)*100
     df1.percentage_gRNAs = (df1[df1["gene_id"] != "unknow"].counts/t_gRNAs)*100
     df1.loc[:, 'percentage'] = df1.loc[:, 'percentage'].round(6)
     df1.loc[:, 'percentage_gRNAs'] = df1.loc[:, 'percentage_gRNAs'].round(6)
-    # sort
+    # Sort
     df1 = df1.sort_values(by='counts', ascending=False)
     df1 = df1.reset_index(drop=True)
-    # accumulative_unknow_percentage
+    # Accumulative_unknow_percentage
     accumulative_unknow = 0
     accumulative_all = 0
     for i in range(0, len(df1)):
@@ -148,39 +146,53 @@ def grna_pipeline(args, scmli_dir):
         df1.loc[i, "accumulative_unknow_percentage"] = round(
             (accumulative_unknow/accumulative_all)*100, 3)
 
-    df1.to_csv(args.outname + '.percentage', sep='\t', index=False)
+    df1.to_csv(args.output_name + '.percentage', sep='\t', index=False)
 
-    # Mutation target region bed file
+    # Bed file for mutation regions targeted by existing gRNA 
     df2 = df1
+    # Filter out unkown genes and genes with 0 counts
     df2 = df2[df2['gene_id'] != 'unknow']
     df2 = df2[df2['counts'] != 0]
+    # Read the all targets.bed file
     df_target = pd.read_csv(scmli_dir+'/test/targets.bed', sep='\t', header=None,
                             names=['chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand'])
+    # Merge existing gRNA mutation regions
     df2 = pd.merge(df2, df_target, left_on='gene_id', right_on='name')
+    # Select the columns
     df2 = df2[['chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'sequence',
                'counts', 'percentage', 'percentage_gRNAs', 'accumulative_unknow_percentage']]
+    # Save the bed file
     df2.to_csv('targets_grna.bed', sep='\t', header=None, index=False)
 
     print('stats2......')
+    # Calculate the number of valid reads, unknown reads and gRNAs reads
     stats['valid_reads'] = np.sum(df1.counts)
     stats['unknow_reads'] = np.sum(df1.loc[df1.gene_id == 'unknow', 'counts'])
     df_gRNAs = df1[(df1.gene_id != 'unknow') & (df1.counts != 0)].copy()
     stats['gRNAs_reads'] = np.sum(df_gRNAs.counts)
+    # Calculate the number of all read kinds, library gRNAs kinds, unknow read kinds and existing gRNAs kinds
     stats['all_kinds'] = len(df1)
     stats['lib_kinds'] = lib_kinds
     stats['unknow_kinds'] = len(df1[df1.gene_id == 'unknow'])
     stats['gRNAs_kinds'] = len(df_gRNAs)
+    # Calculate the percentage of all reads(pass qc) to raw reads
     stats['all/raw_reads_percentage'] = round(
         stats['all_reads'] / stats['raw_reads'], 6)
+    # Calculate the percentage of valid reads to all reads
     stats['valid/all_reads_percentage'] = round(
         stats['valid_reads'] / stats['all_reads'], 6)
+    # Calculate the percentage of gRNAs reads to valid reads
     stats['gRNAs/valid_reads_percentage'] = round(
         stats['gRNAs_reads'] / stats['valid_reads'], 6)
+    # Calculate the percentage of existing gRNAs to library types
     stats['gRNAs_coverage'] = round(
         stats['gRNAs_kinds'] / stats['lib_kinds'], 6)
+    # Calculate the average of all lib gRNAs
     stats['gRNAs_average_all'] = round(np.average(
         df1.loc[df1.gene_id != 'unknow', 'counts']), 6)
+    # Calculate the average of existing lib gRNAs
     stats['gRNAs_average_appeared'] = round(np.average(df_gRNAs.counts), 6)
+    # Save the stats to tsv format
     with open(args.outname+'.stats', 'w') as stats_file:
         for a, b in stats.items():
             stats_file.write('%s\t%s\n' % (a, b))
