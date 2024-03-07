@@ -193,7 +193,7 @@ def grna_pipeline(args, scmli_dir):
     # Calculate the average of existing lib gRNAs
     stats['gRNAs_average_appeared'] = round(np.average(df_gRNAs.counts), 6)
     # Save the stats to tsv format
-    with open(args.outname+'.stats', 'w') as stats_file:
+    with open(args.output_name+'.stats', 'w') as stats_file:
         for a, b in stats.items():
             stats_file.write('%s\t%s\n' % (a, b))
 
