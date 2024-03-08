@@ -55,23 +55,26 @@ def get_score(df1, df2, name1, name2, method):
     df3.lgpab = df3.lgpab.round(3).astype(str)
     df3.reset_index(drop=True, inplace=True)
 
-    df3['result'] = df3.id + ',' + df3.seq + ',' + df3.plate + '_' + df3.well + method + 'rank,' + \
-        df3.a + ',' + df3.b + ',' + df3.ab + ',' + \
-        df3.lgpa + ',' + df3.lgpb + ',' + df3.lgpab
-    result1 = ''
+    df3['result'] = df3.apply(lambda row: f"{row['id']},{row['seq']},"
+                              f"{row['plate']}_{row['well']}{method}rank,"
+                              f"{row['a']},{row['b']},{row['ab']},{row['lgpa']},"
+                              f"{row['lgpb']},{row['lgpab']}", axis=1)
+
+    score = ''
     for i in range(3):
-        rank = '0'+str(i+1)
+        rank = "{:02d}".format(i+1)
         try:
-            result1 += df3.result[i]+'\n'
-            result1 = result1.replace('rank', rank)
+            score += df3.result[i]+'\n'
+            score = score.replace('rank', rank)
         except:
-            result1 += 'Na\n'
-    with open('result3ab.txt', 'a') as f:
-        f.write(result1)
+            score += 'Na\n'
+    with open('location_result.txt', 'a') as f:
+        f.write(score)
 
 
 for n1 in list:
-    # method 01
+    # Method 01
+    # The top three highest values of lgpa*lgpb
     for n2 in list:
         name1 = n1 + 'a'
         name2 = n2 + 'b'
@@ -82,7 +85,8 @@ for n1 in list:
             'gene_id2', 'sequence2', 'counts2', 'percentage2', 'percentage_gRNAs2', 'accumulative_unknow_percentage2'])
         get_score(df1, df2, name1, name2, method)
 
-    # method 02
+    # Method 02
+    # The top three highest values of lgpa*lgpb after removing the maximum values from df1 and df2
     for n2 in list:
         name1 = n1 + 'a'
         name2 = n2 + 'b'
@@ -93,10 +97,10 @@ for n1 in list:
             'gene_id2', 'sequence2', 'counts2', 'percentage2', 'percentage_gRNAs2', 'accumulative_unknow_percentage2'])
         get_score(df1, df2, name1, name2, method)
 
-    with open('result3ab.txt', 'a') as f:
+    with open('location_result.txt', 'a') as f:
         f.write('\n')
 
-df1 = pd.read_csv('result3ab.txt', header=None,
+df1 = pd.read_csv('location_result.txt', header=None,
                   usecols=[0, 2], names=['id', 'no'])
 df2 = pd.read_csv('~/app/scmli/test/targets.bed', sep='\t', header=None,
                   names=['chrom', 'chromStart', 'chromEnd', 'id', 'score', 'strand'], dtype=object)
