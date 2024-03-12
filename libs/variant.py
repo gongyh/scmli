@@ -5,10 +5,12 @@ import re
 import subprocess
 import pandas as pd
 
-
+# Call variants using the modified Snippy software
 def variant_pipeline(args):
     print('trim......')
+    # trim_galore recommends using no more than 8 cores
     trim_threads = min(args.threads, 8)
+    # Configure parameters
     cmd = [
         'trim_galore',
         '--cores', str(trim_threads),
@@ -20,16 +22,20 @@ def variant_pipeline(args):
         '--gzip',
         args.read1, args.read2
     ]
+    # Run trim_galore and save the log
     with open('variant.log', 'w') as log_file:
         subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT)
 
+    # Get the name of the trimmed output file
     name1 = re.split(r'/', args.read1)[-1]
     name1 = re.split(r'\.fastq|\.fq', name1)[0] + '_val_1.fq.gz'
     name2 = re.split(r'/', args.read2)[-1]
     name2 = re.split(r'\.fastq|\.fq', name2)[0] + '_val_2.fq.gz'
 
     print('call variants......')
+    # Snippy requires a pre-created "tmp" folder
     os.makedirs('tmp', exist_ok=True)
+    # Configure parameters
     cmd = [
         'snippy',
         '--cpus', str(args.threads),
@@ -44,28 +50,32 @@ def variant_pipeline(args):
         '--R1', name1,
         '--R2', name2
     ]
-
+    # Run snippy and save the log
     with open('variant.log', 'a') as log_file:
         subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT)
 
-    os.system('snippy --cpus %d --ram %d --basequal 30 --minqual 0.0 --minfrac 0.0 --report --outdir %s_snippy --tmpdir tmp --ref %s --R1 %s --R2 %s >> variant.log 2>&1' %
-              (args.threads, args.ram, args.outname, args.ref, name1, name2))
+    # Handle deletion type separately, it cause errors in target positioning
     print('search deletion......')
-    row = re.findall(
-        r'\d+', os.popen('grep "##" %s_snippy/snps.vcf | wc -l' % args.outname).read())[0]
-    df1 = pd.read_csv(args.outname+'_snippy/snps.vcf',
-                      sep='\t', skiprows=int(row))
-    df2 = df1
-
-    x = len(df1)
+    # Read the snps file, ignoring lines that start with '##'
+    cmd = f'grep -c "##" {args.outname}_snippy/snps.vcfdf_snps'
+    header_count = int(subprocess.check_output(cmd, shell=True).strip())
+    df_snps = pd.read_csv(args.outname+'_snippy/snps.vcf',
+                      sep='\t', skiprows=int(header_count))
+    # Determining the position of gene deletion to check if it's in the target
+    x = len(df_snps)
+    # BED file of deletions
     with open('del.bed', 'w') as f:
+        # Write an initial line
         f.write('chr1\t1\t2\n')
-        x = len(df1)
-        for a in range(x):
-            if 'del' in df1.iloc[a, 7]:
-                y = len(df1.iloc[a, 3])
-                line = df1.iloc[a, 0]+'\t' + \
-                    str(df1.iloc[a, 1]-1)+'\t'+str(df1.iloc[a, 1]+y-1)+'\n'
+        # Iterate through the DataFrame
+        for i in range(x):
+            # Check if 'del' is in the 8th column 'INFO'
+            if 'del' in df_snps.iloc[i, 7]:
+                # Get the length of the 4th column 'REF'
+                y = len(df_snps.iloc[i, 3])
+                # line = 'CHROM' + 'POS'1 + 'POS'2
+                line = df_snps.iloc[i, 0]+'\t' + \
+                    str(df_snps.iloc[i, 1]-1)+'\t'+str(df_snps.iloc[i, 1]+y-1)+'\n'
                 f.write(line)
     os.system(
         'bedtools intersect -a del.bed -b %s -wa -wb > del_target.bed' % args.target)

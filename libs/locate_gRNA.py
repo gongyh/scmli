@@ -11,6 +11,7 @@ We used twenty-four 24-well plates for the experiment.
 Obtained sequencing data from the same plates and the same wells.
 gRNAs results that appear simultaneously in a given plate and well 
 will be considered as the result for that specific plate and well.
+Then perform whole-genome sequencing for each plate to verify mutations.
 '''
 
 # Create a list of 24 numbers since the 24-plate or 24-well
@@ -100,20 +101,29 @@ for n1 in list:
     with open('location_result.txt', 'a') as f:
         f.write('\n')
 
-df1 = pd.read_csv('location_result.txt', header=None,
+# Select gene targets with gRNA
+df_gRNA = pd.read_csv('location_result.txt', header=None,
                   usecols=[0, 2], names=['id', 'no'])
-df2 = pd.read_csv('~/app/scmli/test/targets.bed', sep='\t', header=None,
+df_target = pd.read_csv('~/app/scmli/test/targets.bed', sep='\t', header=None,
                   names=['chrom', 'chromStart', 'chromEnd', 'id', 'score', 'strand'], dtype=object)
-df3 = pd.merge(df1, df2, how='left', on='id')
-df3 = df3[['chrom', 'chromStart', 'chromEnd', 'id', 'score', 'strand', 'no']]
-df3.no = df3.no.str.replace('a|b', '', regex=True)
-df3 = df3.fillna('Na')
+# Retain target information for genes present in gRNA
+df_result = pd.merge(df_gRNA, df_target, how='left', on='id')
+# Change the format
+df_result = df_result[['chrom', 'chromStart', 'chromEnd', 'id', 'score', 'strand', 'no']]
+df_result.no = df_result.no.str.replace('a|b', '', regex=True)
+df_result = df_result.fillna('Na')
 
 for i in list:
+    # each plate
     j = int(i)
-    df_tmp = df3[(j-1)*144:j*144]
+    # Select 72 rows from method_01 and 72 rows from method_02, totaling 144 rows 
+    df_tmp = df_result[(j-1)*144:j*144]
+    # Retain all 72 rows from method_01
     df_c1 = df_tmp[0:72]
+    # Remove the rows in method_02 that are present in method_01.
     df_c2 = df_tmp.drop_duplicates('id')
     df_c2 = df_c2[df_c2.no.str.contains('02_..$', regex=True)]
+    # Combine the results
     df_tmp = pd.concat([df_c1, df_c2])
+    # Save results for each plate
     df_tmp.to_csv('%s.bed' % i, sep='\t', index=False, header=None)
