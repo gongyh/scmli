@@ -54,10 +54,10 @@ def variant_pipeline(args):
     with open('variant.log', 'a') as log_file:
         subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT)
 
-    # Handle deletion type separately, it cause errors in target positioning
+    # Handle deletion type separately, it may overlap but is not within the target region
     print('search deletion......')
     # Read the snps file, ignoring lines that start with '##'
-    cmd = f'grep -c "##" {args.outname}_snippy/snps.vcfdf_snps'
+    cmd = f'grep -c "##" {args.outname}_snippy/snps.vcf'
     header_count = int(subprocess.check_output(cmd, shell=True).strip())
     df_snps = pd.read_csv(args.outname+'_snippy/snps.vcf',
                       sep='\t', skiprows=int(header_count))
@@ -77,54 +77,56 @@ def variant_pipeline(args):
                 line = df_snps.iloc[i, 0]+'\t' + \
                     str(df_snps.iloc[i, 1]-1)+'\t'+str(df_snps.iloc[i, 1]+y-1)+'\n'
                 f.write(line)
-    os.system(
-        'bedtools intersect -a del.bed -b %s -wa -wb > del_target.bed' % args.target)
+    subprocess.run(f'bedtools intersect -a del.bed -b {args.target} -wa -wb > del_target.bed', shell=True)
     with open('del_target.bed', 'a') as f:
         f.write('chr2\t1\t2\n')
-    # target1 (9709), concat in target and deletion overlap
-    print('filter...')
-    os.system('bcftools view -e "QUAL>1" -T %s -O z -o %s_snippy_hq.vcf.gz %s_snippy/snps.vcf.gz' %
-              (args.target, args.outname, args.outname))
-    os.system('bcftools view -v indels -e "QUAL>1" -T del_target.bed -O z -o %s_snippy_del_target.vcf.gz %s_snippy/snps.vcf.gz' %
-              (args.outname, args.outname))
-    os.system('bcftools index %s_snippy_hq.vcf.gz' % args.outname)
-    os.system('bcftools index %s_snippy_del_target.vcf.gz' % args.outname)
-    os.system('bcftools concat -a %s_snippy_hq.vcf.gz %s_snippy_del_target.vcf.gz -o %s_snippy_target.vcf >> variant.log 2>&1' %
-              (args.outname, args.outname, args.outname))
-    os.system(
-        "zcat %s_snippy_hq.vcf.gz | grep -v '^#' | cut -f8 | awk -F'|' '{print $1,$2,$3,$4,$5}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_hq.gids" % (args.outname, args.outname))
-    os.system(
-        "cat %s_snippy_target.vcf | grep -v '^#' | cut -f8 | awk -F'|' '{print $1,$2,$3,$4,$5}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_target.gids" % (args.outname, args.outname))
 
-    # target2 (24), concat
-    os.system(
-        'bedtools intersect -a del.bed -b %s -wa -wb > del_target2.bed' % args.dtarget)
+    print('filter...')
+    # target1: all gRNA target(9709)
+    # Extract variants from the original target1 region
+    subprocess.run(f'bcftools view -e "QUAL>1" -T {args.target} -O z -o {args.outname}_snippy_hq.vcf.gz {args.outname}_snippy/snps.vcf.gz', shell=True)
+    # Extract deletion variants that overlap target1 region
+    subprocess.run(f'bcftools view -v indels -e "QUAL>1" -T del_target.bed -O z -o {args.outname}_snippy_del_target.vcf.gz {args.outname}_snippy/snps.vcf.gz', shell=True)
+    # Create index files
+    subprocess.run(f'bcftools index {args.outname}_snippy_hq.vcf.gz', shell=True)
+    subprocess.run(f'bcftools index {args.outname}_snippy_del_target.vcf.gz', shell=True)
+    # Merge the two parts of variants
+    subprocess.run(f'bcftools concat -a {args.outname}_snippy_hq.vcf.gz {args.outname}_snippy_del_target.vcf.gz -o {args.outname}_snippy_target.vcf >> variant.log 2>&1', shell=True)
+    # Extract gene ids of variants from the original target region
+    subprocess.run(f"zcat {args.outname}_snippy_hq.vcf.gz | grep -v '^#' | cut -f8 | awk -F'|' '{{print $1,$2,$3,$4,$5}}' | grep -o 'NO..G.....' | sort | uniq > {args.outname}_snippy_hq.gids", shell=True)
+    # Extract gene ids of variants from the original and overlap target region
+    subprocess.run(f"cat {args.outname}_snippy_target.vcf | grep -v '^#' | cut -f8 | awk -F'|' '{{print $1,$2,$3,$4,$5}}' | grep -o 'NO..G.....' | sort | uniq > {args.outname}_snippy_target.gids", shell=True)
+
+    # target2: screened gRNA target(obtained in gRNA pipeline)
+    # Select the deletion and target2 overlap region
+    subprocess.run(f'bedtools intersect -a del.bed -b {args.dtarget} -wa -wb > del_target2.bed', shell=True)
+    # Write an initial line
     with open('del_target2.bed', 'a') as f:
         f.write('chr2\t1\t2\n')
-    os.system('bcftools view -e "QUAL>1" -T %s -O z -o %s_snippy_raw_target2.vcf.gz %s_snippy/snps.vcf.gz' %
-              (args.dtarget, args.outname, args.outname))
-    os.system('bcftools view -v indels -e "QUAL>1" -T del_target2.bed -O z -o %s_snippy_del_target2.vcf.gz %s_snippy/snps.vcf.gz' %
-              (args.outname, args.outname))
-    os.system('bcftools index %s_snippy_raw_target2.vcf.gz' % args.outname)
-    os.system('bcftools index %s_snippy_del_target2.vcf.gz' % args.outname)
-    os.system('bcftools concat -a %s_snippy_raw_target2.vcf.gz %s_snippy_del_target2.vcf.gz -o %s_snippy_target2.vcf >> variant.log 2>&1' %
-              (args.outname, args.outname, args.outname))
-    os.system(
-        "cat %s_snippy_target2.vcf | grep -v '^#' | cut -f8 | awk -F'|' '{print $1,$2,$3,$4,$5}' | grep -o 'NO..G.....' | sort | uniq > %s_snippy_target2.gids" % (args.outname, args.outname))
+    # Extract variants from the original target2 region
+    subprocess.run(f'bcftools view -e "QUAL>1" -T {args.dtarget} -O z -o {args.outname}_snippy_raw_target2.vcf.gz {args.outname}_snippy/snps.vcf.gz', shell=True)
+    # Extract variants from the overlap target2 region
+    subprocess.run(f'bcftools view -v indels -e "QUAL>1" -T del_target2.bed -O z -o {args.outname}_snippy_del_target2.vcf.gz {args.outname}_snippy/snps.vcf.gz', shell=True)
+    # Create index files
+    subprocess.run(f'bcftools index {args.outname}_snippy_raw_target2.vcf.gz', shell=True)
+    subprocess.run(f'bcftools index {args.outname}_snippy_del_target2.vcf.gz', shell=True)
+    # Merge the two parts of variants
+    subprocess.run(f'bcftools concat -a {args.outname}_snippy_raw_target2.vcf.gz {args.outname}_snippy_del_target2.vcf.gz -o {args.outname}_snippy_target2.vcf >> variant.log 2>&1', shell=True)
+    # Extract gene ids of variants from the original and overlap target2 region
+    subprocess.run(f"cat {args.outname}_snippy_target2.vcf | grep -v '^#' | cut -f8 | awk -F'|' '{{print $1,$2,$3,$4,$5}}' | grep -o 'NO..G.....' | sort | uniq > {args.outname}_snippy_target2.gids", shell=True)
 
-    # stats add info to txt
-    df3 = pd.read_csv(args.dtarget, sep='\t', header=None, names=[
-                      'chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'sequence', 'counts', 'percentage', 'percentage_gRNAs', 'accumulative_unknow_percentage'])
-    df3['variant'] = 0
-    df3['info'] = ''
+    # Stats and add variant info to target2 dataframe
+    df_target = pd.read_csv(args.dtarget, sep='\t', header=None, names=['chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'no'], dtype=str)
+    df_target['variant'] = 0
+    df_target['info'] = ''
     row2 = re.findall(
         r'\d+', os.popen('grep "##" %s_snippy_target2.vcf | wc -l' % args.outname).read())[0]
-    df4 = pd.read_csv(args.outname+'_snippy_target2.vcf', sep='\t', skiprows=int(
+    df_vars = pd.read_csv(args.outname+'_snippy_target2.vcf', sep='\t', skiprows=int(
         row2), usecols=['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO'])
-    df4['gene_id'] = df4.INFO.str.extract('(NO..G.....)')
-    for i in range(len(df4)):
-        a = df4.gene_id[i]
-        df3.loc[df3['name'] == a, 'variant'] += 1
-        df3.loc[df3['name'] == a, 'info'] += '%s,%s,%s,%s;' % (
-            df4.iloc[i, 0], df4.iloc[i, 1], df4.iloc[i, 3], df4.iloc[i, 4])
-    df3.to_csv('target2_variant.txt', sep='\t', index=False)
+    df_vars['gene_id'] = df_vars.INFO.str.extract('(NO..G.....)')
+    for i in range(len(df_vars)):
+        a = df_vars.gene_id[i]
+        df_target.loc[df_target['name'] == a, 'variant'] += 1
+        df_target.loc[df_target['name'] == a, 'info'] += '%s,%s,%s,%s;' % (
+            df_vars.iloc[i, 0], df_vars.iloc[i, 1], df_vars.iloc[i, 3], df_vars.iloc[i, 4])
+    df_target.to_csv('target2_variant.txt', sep='\t', index=False)
