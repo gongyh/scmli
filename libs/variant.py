@@ -6,6 +6,8 @@ import subprocess
 import pandas as pd
 
 # Call variants using the modified Snippy software
+
+
 def variant_pipeline(args):
     print('trim......')
     # trim_galore recommends using no more than 8 cores
@@ -60,13 +62,13 @@ def variant_pipeline(args):
     cmd = f'grep -c "##" {args.outname}_snippy/snps.vcf'
     header_count = int(subprocess.check_output(cmd, shell=True).strip())
     df_snps = pd.read_csv(args.outname+'_snippy/snps.vcf',
-                      sep='\t', skiprows=int(header_count))
+                          sep='\t', skiprows=int(header_count))
     # Determining the position of gene deletion to check if it's in the target
     x = len(df_snps)
     # BED file of deletions
     with open('del.bed', 'w') as f:
         # Write an initial line
-        f.write('chr1\t1\t2\n')
+        f.write('chr1\t2\t3\n')
         # Iterate through the DataFrame
         for i in range(x):
             # Check if 'del' is in the 8th column 'INFO'
@@ -75,11 +77,12 @@ def variant_pipeline(args):
                 y = len(df_snps.iloc[i, 3])
                 # line = 'CHROM' + 'POS'1 + 'POS'2
                 line = df_snps.iloc[i, 0]+'\t' + \
-                    str(df_snps.iloc[i, 1]-1)+'\t'+str(df_snps.iloc[i, 1]+y-1)+'\n'
+                    str(df_snps.iloc[i, 1]-1)+'\t' + \
+                    str(df_snps.iloc[i, 1]+y-1)+'\n'
                 f.write(line)
     subprocess.run(f'bedtools intersect -a del.bed -b {args.target} -wa -wb > del_target.bed', shell=True)
     with open('del_target.bed', 'a') as f:
-        f.write('chr2\t1\t2\n')
+        f.write('chr1\t3\t4\n')
 
     print('filter...')
     # target1: all gRNA target(9709)
@@ -116,17 +119,25 @@ def variant_pipeline(args):
     subprocess.run(f"cat {args.outname}_snippy_target2.vcf | grep -v '^#' | cut -f8 | awk -F'|' '{{print $1,$2,$3,$4,$5}}' | grep -o 'NO..G.....' | sort | uniq > {args.outname}_snippy_target2.gids", shell=True)
 
     # Stats and add variant info to target2 dataframe
-    df_target = pd.read_csv(args.dtarget, sep='\t', header=None, names=['chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'no'], dtype=str)
-    df_target['variant'] = 0
-    df_target['info'] = ''
-    row2 = re.findall(
-        r'\d+', os.popen('grep "##" %s_snippy_target2.vcf | wc -l' % args.outname).read())[0]
-    df_vars = pd.read_csv(args.outname+'_snippy_target2.vcf', sep='\t', skiprows=int(
-        row2), usecols=['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO'])
+    df_target = pd.read_csv(args.dtarget, sep='\t', header=None, names=[
+                            'chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'no'], dtype=str)
+    # Read the snps file, ignoring lines that start with '##'
+    cmd = f'grep -c "##" {args.outname}_snippy_target2.vcf'
+    header_count = int(subprocess.check_output(cmd, shell=True).strip())
+    df_vars = pd.read_csv(args.outname+'_snippy_target2.vcf', sep='\t', skiprows=int(header_count),
+                          usecols=['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO'])
+    # Extract variation information
     df_vars['gene_id'] = df_vars.INFO.str.extract('(NO..G.....)')
-    for i in range(len(df_vars)):
-        a = df_vars.gene_id[i]
-        df_target.loc[df_target['name'] == a, 'variant'] += 1
-        df_target.loc[df_target['name'] == a, 'info'] += '%s,%s,%s,%s;' % (
-            df_vars.iloc[i, 0], df_vars.iloc[i, 1], df_vars.iloc[i, 3], df_vars.iloc[i, 4])
+    df_vars['AODP'] = df_vars.INFO.str.extract('(AO.*DP.*?;)')
+    df_vars['type'] = df_vars.INFO.str.extract('(\|.*?\|.*?\|)')
+    # Create a dataframe to store the aggregated information
+    info_cols = ['#CHROM', 'POS', 'REF', 'ALT', 'AODP', 'type']
+    df_vars['info'] = df_vars[info_cols].astype(str).agg(';'.join, axis=1)
+    # Merge the variation information into the target dataframe
+    variants_grouped = df_vars.groupby('gene_id')['info'].agg(
+        [('variant', 'count'), ('info', ' '.join)]).reset_index()
+    df_target = df_target.merge(
+        variants_grouped, how='left', left_on='name', right_on='gene_id')
+    df_target['variant'] = df_target['variant'].fillna(0).astype(int)
+    # Save the result
     df_target.to_csv('target2_variant.txt', sep='\t', index=False)
