@@ -13,7 +13,10 @@ Single cell mutant library inspection
 
 ## Background
 
-Identification and description of gRNA mutant library.
+To construct a whole-genome random mutation library in an efficient, reliable and economical manner, we developed a specialized experimental design and corresponding analysis workflow. <br />
+Specifically, we utilized 24 plates, each containing 24 wells, as one batch, with each well representing an individual mutation experiment. 
+For same plate and same well, we added unique barcode to the gRNA PCR products and then proceeded with next-generation sequencing. In parallel, we performed whole-genome sequencing for samples from each plate. <br />
+By identifying gRNAs present in both the plate and the well, we were able to accurately determine the specific gRNA for specific well and assess mutations at the targeted locations, thereby validating our results.
 
 ## Install
 
@@ -54,8 +57,13 @@ NO01G00250,ccgggtccgattcccggtgcctgcaACACGATAGTCAAGACGCTGgttttagagctagaaatagcaagt
 ```
 required: reads(fastq file), fixed sequence(str), gRNAs library(.csv)
 ```
-### variant model <br />
-we changed the parameters in snippy, copy lib/snippy to path/bin/snippy
+### variant model
+Call variants in the data, filtering and statistical variation information in the target region <br />
+We changed the parameters in snippy, copy lib/snippy to path/bin/snippy <br />
+```
+required: reads(fastq file), target(bed file), reference(.gbk)
+```
+
 ## Arguments
 ### gRNA model
 ```
@@ -82,6 +90,7 @@ required arguments:
   -r2 READ2                         Read2 fastq file
   --ref REF                         reference
   --target TARGET                   target
+  --dtarget TARGET2                 target2
 
 optional arguments:
   -h, --help                        show this help message and exit
@@ -89,6 +98,8 @@ optional arguments:
   -n OUTNAME                        Prefix of output files, default='my_project'
   -o OUTDIR                         Directory of output files, default='output'
 ```
+### locate_gRNA.py
+Script for identifying gRNA results in experimental protocols.
 
 ## Test
 
@@ -105,6 +116,7 @@ python3 scmli.py variant \
   -r2 test/test_R2.fq.gz \
   --ref test/genes.gbk \
   --target test/targets.bed
+  --dtarget test/targets.bed
 ```
 
 ## Results
@@ -153,8 +165,9 @@ python3 scmli.py variant \
 `accumulative_unknow_percentage.plot`: Percentage of accumulative unknow sequences <br />
 
 ### variant model
-`my_project_snippy_hq.vcf`: Result of variant
-`my_project_snippy_hq.gids`: Number of variant
+`my_project_snippy_hq.vcf`: Result of variant <br />
+`my_project_snippy_hq.gids`: Gene id of variant <br />
+`target2_variant.txt`: Variation information in target region
 ## License
 
 MIT
