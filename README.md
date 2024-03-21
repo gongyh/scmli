@@ -115,7 +115,7 @@ python3 scmli.py variant \
   -r1 test/test_R1.fq.gz \
   -r2 test/test_R2.fq.gz \
   --ref test/genes.gbk \
-  --target test/targets.bed
+  --target test/targets.bed \
   --dtarget test/targets.bed
 ```
 

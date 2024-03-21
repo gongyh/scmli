@@ -41,3 +41,4 @@ def test_variant():
     args.func(args)
     assert os.path.getsize('output/my_project_snippy/snps.vcf') > 10
     assert os.path.getsize('output/my_project_snippy_hq.vcf.gz') > 10
+    assert os.path.getsize('output/my_project_snippy_target2.gids') > 10
