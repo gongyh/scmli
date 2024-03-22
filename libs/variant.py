@@ -26,6 +26,7 @@ def variant_pipeline(args):
     ]
     # Run trim_galore and save the log
     with open('variant.log', 'w') as log_file:
+        log_file.write(f"{args}\n")
         subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT)
 
     # Get the name of the trimmed output file

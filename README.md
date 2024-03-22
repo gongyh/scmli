@@ -89,8 +89,8 @@ required arguments:
   -r1 READ1                         Read1 fastq file
   -r2 READ2                         Read2 fastq file
   --ref REF                         reference
-  --target TARGET                   target
-  --dtarget TARGET2                 target2
+  --target TARGET                   target region of variant
+  --dtarget TARGET2                 selected smaller target region
 
 optional arguments:
   -h, --help                        show this help message and exit
@@ -116,7 +116,7 @@ python3 scmli.py variant \
   -r2 test/test_R2.fq.gz \
   --ref test/genes.gbk \
   --target test/targets.bed \
-  --dtarget test/targets.bed
+  --dtarget test/filter.bed
 ```
 
 ## Results

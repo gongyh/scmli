@@ -31,7 +31,7 @@ reads <- ggplot(df_reads, aes(Key, Counts)) +
     axis.title.y = element_text(size = 16),
     axis.text.y = element_text(size = 12)
   )
-ggsave("reads.pdf", reads)
+suppressMessages(ggsave("reads.pdf", reads))
 
 # plot2(1/2) frequency
 frequency <- ggplot(df_gRNAs, aes(x = reorder(gene_id, gRNAs_percentage), y = gRNAs_percentage)) +
@@ -62,7 +62,7 @@ frequency <- frequency + geom_text(
   y = y_range[2] * 0.92,
   aes(label = paste0("Var = ", Var, "\nCV = ", CV))
 )
-ggsave("frequency.png", frequency)
+suppressMessages(ggsave("frequency.png", frequency))
 
 # plot2(2/2) frequency_detected
 frequency_detected <- ggplot(df_gRNAs_detected, aes(x = reorder(gene_id, gRNAs_percentage), y = gRNAs_percentage)) +
@@ -93,7 +93,7 @@ frequency_detected <- frequency_detected + geom_text(
   y = y_range[2] * 0.92,
   aes(label = paste0("Var = ", Var, "\nCV = ", CV))
 )
-ggsave("frequency_detected.png", frequency_detected)
+suppressMessages(ggsave("frequency_detected.png", frequency_detected))
 
 
 # plot3(1/2) frequency_distribution
@@ -108,7 +108,7 @@ frequency_distribution <- ggplot(df_gRNAs, aes(x = gRNAs_percentage)) +
     axis.title.x = element_text(size = 16),
     axis.title.y = element_text(size = 16)
   )
-ggsave("frequency_distribution.pdf", frequency_distribution)
+suppressMessages(ggsave("frequency_distribution.pdf", frequency_distribution))
 
 # plot3(2/2) frequency_distribution_detected
 frequency_distribution_detected <- ggplot(df_gRNAs_detected, aes(x = gRNAs_percentage)) +
@@ -122,7 +122,7 @@ frequency_distribution_detected <- ggplot(df_gRNAs_detected, aes(x = gRNAs_perce
     axis.title.x = element_text(size = 16),
     axis.title.y = element_text(size = 16)
   )
-ggsave("frequency_distribution_detected.pdf", frequency_distribution_detected)
+suppressMessages(ggsave("frequency_distribution_detected.pdf", frequency_distribution_detected))
 
 # plot4 accumulative_unknow_percentage
 accumulative_unknow_percentage <- ggplot(df_detected, aes(x = seq(1, length(percentage)), y = accumulative_unknow_percentage)) +
@@ -130,4 +130,4 @@ accumulative_unknow_percentage <- ggplot(df_detected, aes(x = seq(1, length(perc
   xlab("Accumulative kinds of sequences") +
   ylab("Unknow percentage") +
   theme_bw()
-ggsave("accumulative_unknow_percentage.pdf", accumulative_unknow_percentage)
+suppressMessages(ggsave("accumulative_unknow_percentage.pdf", accumulative_unknow_percentage))

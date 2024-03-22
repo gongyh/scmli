@@ -22,6 +22,7 @@ def grna_pipeline(args, scmli_dir):
     # Run fastqc
     cmd = [FASTQC_BIN, '-o', '.', args.read1, args.read2]
     with open('grna_pipeline.log', 'a') as log_file:
+        log_file.write(f"{args}\n")
         result = subprocess.run(cmd, stdout=log_file, stderr=subprocess.STDOUT)
     if result.returncode != 0:
         print("FastQC failed with return code:", result.returncode)

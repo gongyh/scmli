@@ -135,8 +135,6 @@ def variant(args):
     print("Variant Finished")
     # Change the current working directory back to the original
     os.chdir(current_dir)
-    # Print the arguments
-    print(args)
 
 
 # Define the main function
